@@ -2,24 +2,24 @@ using System.Text.Json;
 
 namespace PriceAggregator.Scraper;
 
-public class MigrosScraper
+public class MacroCenterScraper
 {
     private readonly HttpClient _httpClient;
 
-    public MigrosScraper(HttpClient httpClient)
+    public MacroCenterScraper(HttpClient httpClient)
     {
         _httpClient = httpClient;
 
         _httpClient.DefaultRequestHeaders.Add("User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
         _httpClient.DefaultRequestHeaders.Add("Accept", "application/json, text/plain, */*");
-        _httpClient.DefaultRequestHeaders.Add("Accept-Language", "tr-TR,tr;q=0.9,en;q=0.8");
-        _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.migros.com.tr/");
+        _httpClient.DefaultRequestHeaders.Add("Accept-Language", "tr-TR,tr;q=0.9");
+        _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.macrocenter.com.tr/");
     }
 
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
-        var url = $"https://www.migros.com.tr/rest/products/search?query={searchTerm}&sirala=akilli-siralama";
+        var url = $"https://www.macrocenter.com.tr/rest/products/search?q={searchTerm}&page-size=30";
         var response = await _httpClient.GetStringAsync(url);
         var json = JsonDocument.Parse(response);
 
@@ -39,7 +39,7 @@ public class MigrosScraper
                 ImageUrl = imageUrl,
                 Price = p.GetProperty("shownPrice").GetInt32() / 100m,
                 RegularPrice = p.GetProperty("regularPrice").GetInt32() / 100m,
-                ProductUrl = $"https://www.migros.com.tr/{p.GetProperty("prettyName").GetString()}"
+                ProductUrl = $"https://www.macrocenter.com.tr/{p.GetProperty("prettyName").GetString()}"
             });
         }
 

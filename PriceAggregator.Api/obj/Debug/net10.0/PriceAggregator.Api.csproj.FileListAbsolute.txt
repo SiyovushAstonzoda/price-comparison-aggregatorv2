@@ -64,3 +64,4 @@
 /Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.pdb
 /Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.genruntimeconfig.cache
 /Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/ref/PriceAggregator.Api.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.sourcelink.json
