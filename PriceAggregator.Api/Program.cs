@@ -1,6 +1,5 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
-using PriceAggregator.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +18,33 @@ app.UseCors("AllowFrontend");
 
 string connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
 
+app.MapGet("/api/products/{masterId}", async (int masterId) =>
+{
+    using var db = new SqlConnection(connectionString);
+    var offers = await db.QueryAsync(@"
+        SELECT mp.CanonicalTitle, p.Source, p.Price, p.ImageUrl, p.ProductUrl
+        FROM MasterProducts mp
+        JOIN Products p ON p.MasterProductId = mp.Id
+        WHERE mp.Id = @MasterId
+        ORDER BY p.Price ASC",
+        new { MasterId = masterId });
+
+    return Results.Ok(offers);
+});
+
 app.MapGet("/api/products", async () =>
 {
     using var db = new SqlConnection(connectionString);
-    var products = await db.QueryAsync<ProductDto>(
-        "SELECT Source, Title, ImageUrl, Price, RegularPrice, ProductUrl FROM Products ORDER BY LastUpdated DESC");
-    return Results.Ok(products);
+    var masterProducts = await db.QueryAsync(@"
+        SELECT mp.Id, mp.CanonicalTitle, mp.Brand,
+               MIN(p.Price) AS LowestPrice,
+               COUNT(p.Id) AS OfferCount
+        FROM MasterProducts mp
+        JOIN Products p ON p.MasterProductId = mp.Id
+        GROUP BY mp.Id, mp.CanonicalTitle, mp.Brand
+        ORDER BY mp.CanonicalTitle");
+
+    return Results.Ok(masterProducts);
 });
 
 app.Run();

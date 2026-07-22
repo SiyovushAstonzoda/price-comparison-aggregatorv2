@@ -8,4 +8,5 @@ public class ProductDto
     public decimal Price { get; set; }
     public decimal RegularPrice { get; set; }
     public string ProductUrl { get; set; } = "";
+    public string Brand { get; set; }
 }

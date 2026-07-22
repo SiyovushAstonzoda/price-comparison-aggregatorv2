@@ -12,18 +12,19 @@ public class ProductRepository
         _connectionString = connectionString;
     }
 
-    public async Task SaveAsync(string source, ProductDto product)
+    public async Task<int> SaveAsync(string source, ProductDto product)
     {
         using var db = new SqlConnection(_connectionString);
-        await db.ExecuteAsync(@"
-            MERGE Products AS target
-            USING (SELECT @Source AS Source, @ExternalId AS ExternalId) AS src
-            ON target.Source = src.Source AND target.ExternalId = src.ExternalId
-            WHEN MATCHED THEN
-                UPDATE SET Title=@Title, ImageUrl=@ImageUrl, Price=@Price, RegularPrice=@RegularPrice, LastUpdated=GETDATE()
-            WHEN NOT MATCHED THEN
-                INSERT (Source, ExternalId, Title, ImageUrl, Price, RegularPrice, ProductUrl, LastUpdated)
-                VALUES (@Source, @ExternalId, @Title, @ImageUrl, @Price, @RegularPrice, @ProductUrl, GETDATE());",
+        var id = await db.QuerySingleAsync<int>(@"
+        MERGE Products AS target
+        USING (SELECT @Source AS Source, @ExternalId AS ExternalId) AS src
+        ON target.Source = src.Source AND target.ExternalId = src.ExternalId
+        WHEN MATCHED THEN
+            UPDATE SET Title=@Title, ImageUrl=@ImageUrl, Price=@Price, RegularPrice=@RegularPrice, LastUpdated=GETDATE()
+        WHEN NOT MATCHED THEN
+            INSERT (Source, ExternalId, Title, ImageUrl, Price, RegularPrice, ProductUrl, LastUpdated)
+            VALUES (@Source, @ExternalId, @Title, @ImageUrl, @Price, @RegularPrice, @ProductUrl, GETDATE())
+        OUTPUT INSERTED.Id;",
             new
             {
                 Source = source,
@@ -34,5 +35,7 @@ public class ProductRepository
                 product.RegularPrice,
                 product.ProductUrl
             });
+
+        return id;
     }
 }

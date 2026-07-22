@@ -36,6 +36,7 @@ public class MacroCenterScraper
             {
                 ExternalId = p.GetProperty("id").GetInt64(),
                 Title = p.GetProperty("name").GetString() ?? "",
+                Brand = p.TryGetProperty("brand", out var brand) ? brand.GetProperty("name").GetString() : null,
                 ImageUrl = imageUrl,
                 Price = p.GetProperty("shownPrice").GetInt32() / 100m,
                 RegularPrice = p.GetProperty("regularPrice").GetInt32() / 100m,
