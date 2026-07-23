@@ -1,4 +1,4 @@
-﻿using PriceAggregator.Scraper;
+﻿using PriceAggregator.Core;
 
 var connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
 

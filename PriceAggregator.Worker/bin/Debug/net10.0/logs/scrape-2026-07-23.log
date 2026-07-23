@@ -1,0 +1,12 @@
+[2026-07-23 12:37:59] === Starting scheduled scrape ===
+[2026-07-23 12:37:59] Migros fetched: 30, Macrocenter fetched: 30
+[2026-07-23 12:37:59] Saved+matched successfully: 60, Failed: 0
+[2026-07-23 12:37:59] === Scrape finished. Waiting 60s until next run. ===
+[2026-07-23 12:38:59] === Starting scheduled scrape ===
+[2026-07-23 12:39:00] Migros fetched: 30, Macrocenter fetched: 30
+[2026-07-23 12:39:00] Saved+matched successfully: 60, Failed: 0
+[2026-07-23 12:39:00] === Scrape finished. Waiting 60s until next run. ===
+[2026-07-23 12:40:06] === Starting scheduled scrape ===
+[2026-07-23 12:40:07] Migros fetched: 30, Macrocenter fetched: 30
+[2026-07-23 12:40:07] Saved+matched successfully: 60, Failed: 0
+[2026-07-23 12:40:07] === Scrape finished. Waiting 1h until next run. ===
