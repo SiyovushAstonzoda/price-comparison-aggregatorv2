@@ -9,6 +9,7 @@ public class MacroCenterScraper
     public MacroCenterScraper(HttpClient httpClient)
     {
         _httpClient = httpClient;
+        _httpClient.Timeout = TimeSpan.FromSeconds(15);
 
         _httpClient.DefaultRequestHeaders.Add("User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
@@ -19,31 +20,74 @@ public class MacroCenterScraper
 
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
-        var url = $"https://www.macrocenter.com.tr/rest/products/search?q={searchTerm}&page-size=30";
-        var response = await _httpClient.GetStringAsync(url);
-        var json = JsonDocument.Parse(response);
-
         var results = new List<ProductDto>();
-        var products = json.RootElement.GetProperty("data").GetProperty("storeProductInfos");
 
-        foreach (var p in products.EnumerateArray())
+        try
         {
-            string? imageUrl = null;
-            if (p.TryGetProperty("images", out var images) && images.GetArrayLength() > 0)
-                imageUrl = images[0].GetProperty("urls").GetProperty("PRODUCT_DETAIL").GetString();
+            var url = $"https://www.macrocenter.com.tr/rest/products/search?q={searchTerm}&page-size=30";
+            var response = await _httpClient.GetStringAsync(url);
+            var json = JsonDocument.Parse(response);
 
-            results.Add(new ProductDto
+            if (!json.RootElement.TryGetProperty("data", out var data) ||
+                !data.TryGetProperty("storeProductInfos", out var products))
             {
-                ExternalId = p.GetProperty("id").GetInt64(),
-                Title = p.GetProperty("name").GetString() ?? "",
-                Brand = p.TryGetProperty("brand", out var brand) ? brand.GetProperty("name").GetString() : null,
-                ImageUrl = imageUrl,
-                Price = p.GetProperty("shownPrice").GetInt32() / 100m,
-                RegularPrice = p.GetProperty("regularPrice").GetInt32() / 100m,
-                ProductUrl = $"https://www.macrocenter.com.tr/{p.GetProperty("prettyName").GetString()}"
-            });
+                Console.WriteLine("[Migros] Unexpected response shape — no products found.");
+                return results;
+            }
+
+            foreach (var p in products.EnumerateArray())
+            {
+                try
+                {
+                    results.Add(ParseProduct(p));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Migros] Skipped one product due to parse error: {ex.Message}");
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"[Migros] Network error: {ex.Message}");
+        }
+        catch (TaskCanceledException)
+        {
+            Console.WriteLine("[Migros] Request timed out.");
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"[Migros] Failed to parse JSON: {ex.Message}");
         }
 
         return results;
+    }
+
+    private ProductDto ParseProduct(JsonElement p)
+    {
+        string? imageUrl = null;
+        if (p.TryGetProperty("images", out var images) && images.GetArrayLength() > 0 &&
+            images[0].TryGetProperty("urls", out var urls) &&
+            urls.TryGetProperty("PRODUCT_DETAIL", out var detailUrl))
+        {
+            imageUrl = detailUrl.GetString();
+        }
+
+        string? brand = null;
+        if (p.TryGetProperty("brand", out var brandEl) && brandEl.TryGetProperty("name", out var brandName))
+            brand = brandName.GetString();
+
+        return new ProductDto
+        {
+            ExternalId = p.GetProperty("id").GetInt64(),
+            Title = p.TryGetProperty("name", out var name) ? name.GetString() ?? "" : "",
+            Brand = brand,
+            ImageUrl = imageUrl,
+            Price = p.TryGetProperty("shownPrice", out var price) ? price.GetInt32() / 100m : 0,
+            RegularPrice = p.TryGetProperty("regularPrice", out var regPrice) ? regPrice.GetInt32() / 100m : 0,
+            ProductUrl = p.TryGetProperty("prettyName", out var pretty)
+                ? $"https://www.macrocenter.com.tr/{pretty.GetString()}"
+                : ""
+        };
     }
 }

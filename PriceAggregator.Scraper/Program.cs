@@ -12,19 +12,38 @@ var repo = new ProductRepository(connectionString);
 var matchingService = new MatchingService(connectionString);
 
 string searchItem = "su";
+int savedCount = 0;
+int failedCount = 0;
 
 var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
 foreach (var product in migrosProducts)
 {
     var savedId = await repo.SaveAsync("migros", product);
-    await matchingService.MatchProductAsync(savedId, product.Brand, product.Title);
+    if (savedId is null)
+    {
+        failedCount++;
+        continue;
+    }
+
+    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+    if (matched) savedCount++;
+    else failedCount++;
 }
 
 var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
 foreach (var product in macroProducts)
 {
     var savedId = await repo.SaveAsync("macrocenter", product);
-    await matchingService.MatchProductAsync(savedId, product.Brand, product.Title);
+    if (savedId is null)
+    {
+        failedCount++;
+        continue;
+    }
+
+    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+    if (matched) savedCount++;
+    else failedCount++;
 }
 
-Console.WriteLine($"Saved {migrosProducts.Count} Migros + {macroProducts.Count} Macrocenter products.");
+Console.WriteLine($"Done. Migros fetched: {migrosProducts.Count}, Macrocenter fetched: {macroProducts.Count}");
+Console.WriteLine($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
