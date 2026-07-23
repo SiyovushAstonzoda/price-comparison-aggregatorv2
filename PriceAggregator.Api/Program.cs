@@ -47,4 +47,21 @@ app.MapGet("/api/products", async () =>
     return Results.Ok(masterProducts);
 });
 
+app.MapGet("/api/products/search", async (string q) =>
+{
+    using var db = new SqlConnection(connectionString);
+    var results = await db.QueryAsync(@"
+        SELECT mp.Id, mp.CanonicalTitle, mp.Brand,
+               MIN(p.Price) AS LowestPrice,
+               COUNT(p.Id) AS OfferCount
+        FROM MasterProducts mp
+        JOIN Products p ON p.MasterProductId = mp.Id
+        WHERE mp.CanonicalTitle LIKE @Query
+        GROUP BY mp.Id, mp.CanonicalTitle, mp.Brand
+        ORDER BY mp.CanonicalTitle",
+        new { Query = $"%{q}%" });
+
+    return Results.Ok(results);
+});
+
 app.Run();

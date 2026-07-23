@@ -1,4 +1,27 @@
-const API_BASE = "http://localhost:5196/api"; // replace 5xxx with your actual API port
+const API_BASE = "http://localhost:5196/api";
+
+function renderProducts(masterProducts) {
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  if (masterProducts.length === 0) {
+    container.innerHTML = "No products found.";
+    return;
+  }
+
+  masterProducts.forEach(mp => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h3>${mp.CanonicalTitle}</h3>
+      <p class="brand">${mp.Brand ?? ""}</p>
+      <p class="price">From ${mp.LowestPrice.toFixed(2)} TL</p>
+      <p class="offer-count">${mp.OfferCount} store${mp.OfferCount > 1 ? "s" : ""}</p>
+    `;
+    card.addEventListener("click", () => openProductDetail(mp.Id, mp.CanonicalTitle));
+    container.appendChild(card);
+  });
+}
 
 async function loadProducts() {
   const container = document.getElementById("products");
@@ -7,28 +30,23 @@ async function loadProducts() {
   try {
     const res = await fetch(`${API_BASE}/products`);
     const masterProducts = await res.json();
-
-    container.innerHTML = "";
-
-    if (masterProducts.length === 0) {
-      container.innerHTML = "No products found.";
-      return;
-    }
-
-  masterProducts.forEach(mp => {
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <h3>${mp.CanonicalTitle}</h3>
-    <p class="brand">${mp.Brand ?? ""}</p>
-    <p class="price">From ${mp.LowestPrice.toFixed(2)} TL</p>
-    <p class="offer-count">${mp.OfferCount} store${mp.OfferCount > 1 ? "s" : ""}</p>
-  `;
-  card.addEventListener("click", () => openProductDetail(mp.Id, mp.CanonicalTitle));
-  container.appendChild(card);
-  });
+    renderProducts(masterProducts);
   } catch (err) {
     container.innerHTML = "Failed to load products.";
+    console.error(err);
+  }
+}
+
+async function searchProducts(query) {
+  const container = document.getElementById("products");
+  container.innerHTML = "Searching...";
+
+  try {
+    const res = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(query)}`);
+    const results = await res.json();
+    renderProducts(results);
+  } catch (err) {
+    container.innerHTML = "Search failed.";
     console.error(err);
   }
 }
@@ -46,16 +64,16 @@ async function openProductDetail(masterId, title) {
 
     offersContainer.innerHTML = "";
     offers.forEach(o => {
-    const row = document.createElement("div");
-    row.className = "offer-row";
-    row.innerHTML = `
-      <img src="${o.ImageUrl ?? ''}" alt="${o.Source}" />
-      <span class="source">${o.Source}</span>
-      <span class="offer-price">${o.Price.toFixed(2)} TL</span>
-      <a href="${o.ProductUrl}" target="_blank">View →</a>
-    `;
-    offersContainer.appendChild(row);
-  });
+      const row = document.createElement("div");
+      row.className = "offer-row";
+      row.innerHTML = `
+        <img src="${o.ImageUrl ?? ''}" alt="${o.Source}" />
+        <span class="source">${o.Source}</span>
+        <span class="offer-price">${o.Price.toFixed(2)} TL</span>
+        <a href="${o.ProductUrl}" target="_blank">View →</a>
+      `;
+      offersContainer.appendChild(row);
+    });
   } catch (err) {
     offersContainer.innerHTML = "Failed to load offers.";
     console.error(err);
@@ -64,6 +82,15 @@ async function openProductDetail(masterId, title) {
 
 document.getElementById("closeModal").addEventListener("click", () => {
   document.getElementById("modal").classList.add("hidden");
+});
+
+document.getElementById("searchBox").addEventListener("input", (e) => {
+  const query = e.target.value.trim();
+  if (query.length === 0) {
+    loadProducts();
+  } else {
+    searchProducts(query);
+  }
 });
 
 loadProducts();

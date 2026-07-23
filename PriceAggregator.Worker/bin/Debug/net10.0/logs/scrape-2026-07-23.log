@@ -10,3 +10,51 @@
 [2026-07-23 12:40:07] Migros fetched: 30, Macrocenter fetched: 30
 [2026-07-23 12:40:07] Saved+matched successfully: 60, Failed: 0
 [2026-07-23 12:40:07] === Scrape finished. Waiting 1h until next run. ===
+[2026-07-23 12:44:01] === Starting scheduled scrape ===
+[2026-07-23 12:44:02] Migros fetched: 30, Macrocenter fetched: 30
+[2026-07-23 12:44:02] Saved+matched successfully: 60, Failed: 0
+[2026-07-23 12:44:02] === Scrape finished. Waiting 6h until next run. ===
+[2026-07-23 16:34:06] === Starting scheduled scrape ===
+[2026-07-23 16:34:06] --- Searching 'su' ---
+[2026-07-23 16:34:10] --- Searching 'nutella' ---
+[2026-07-23 16:34:13] --- Searching 'çay' ---
+[2026-07-23 16:34:17] --- Searching 'kahve' ---
+[2026-07-23 16:34:20] --- Searching 'makarna' ---
+[2026-07-23 16:34:24] --- Searching 'zeytinyağı' ---
+[2026-07-23 16:34:28] --- Searching 'peynir' ---
+[2026-07-23 16:34:31] --- Searching 'yumurta' ---
+[2026-07-23 16:34:35] Saved+matched successfully: 446, Failed: 0
+[2026-07-23 16:34:35] === Scrape finished. Waiting 6h until next run. ===
+[2026-07-23 16:50:30] === Starting scheduled scrape ===
+[2026-07-23 16:50:30] --- Searching 'su' ---
+[2026-07-23 16:50:34] --- Searching 'nutella' ---
+[2026-07-23 16:50:37] --- Searching 'çay' ---
+[2026-07-23 16:50:41] --- Searching 'kahve' ---
+[2026-07-23 16:50:45] --- Searching 'makarna' ---
+[2026-07-23 16:50:49] --- Searching 'zeytinyağı' ---
+[2026-07-23 16:50:53] --- Searching 'peynir' ---
+[2026-07-23 16:50:57] --- Searching 'yumurta' ---
+[2026-07-23 16:51:00] Saved+matched successfully: 649, Failed: 0
+[2026-07-23 16:51:00] === Scrape finished. Waiting 6h until next run. ===
+[2026-07-23 16:54:02] === Starting scheduled scrape ===
+[2026-07-23 16:54:02] --- Searching 'su' ---
+[2026-07-23 16:54:03] --- Searching 'nutella' ---
+[2026-07-23 16:54:03] --- Searching 'çay' ---
+[2026-07-23 16:54:04] --- Searching 'kahve' ---
+[2026-07-23 16:54:05] --- Searching 'makarna' ---
+[2026-07-23 16:54:06] --- Searching 'zeytinyağı' ---
+[2026-07-23 16:54:06] --- Searching 'peynir' ---
+[2026-07-23 16:54:07] --- Searching 'yumurta' ---
+[2026-07-23 16:54:08] Saved+matched successfully: 600, Failed: 0
+[2026-07-23 16:54:08] === Scrape finished. Waiting 6h until next run. ===
+[2026-07-23 17:12:46] === Starting scheduled scrape ===
+[2026-07-23 17:12:46] --- Searching 'su' ---
+[2026-07-23 17:12:47] --- Searching 'nutella' ---
+[2026-07-23 17:12:47] --- Searching 'çay' ---
+[2026-07-23 17:12:48] --- Searching 'kahve' ---
+[2026-07-23 17:12:49] --- Searching 'makarna' ---
+[2026-07-23 17:12:50] --- Searching 'zeytinyağı' ---
+[2026-07-23 17:12:51] --- Searching 'peynir' ---
+[2026-07-23 17:12:52] --- Searching 'yumurta' ---
+[2026-07-23 17:12:52] Saved+matched successfully: 600, Failed: 0
+[2026-07-23 17:12:52] === Scrape finished. Waiting 6h until next run. ===

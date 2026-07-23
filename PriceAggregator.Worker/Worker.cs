@@ -7,7 +7,7 @@ public class Worker : BackgroundService
     private readonly string _connectionString =
         "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
 
-    private readonly TimeSpan _interval = TimeSpan.FromHours(1); // adjust as needed
+    private readonly TimeSpan _interval = TimeSpan.FromHours(6); // adjust as needed
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -29,6 +29,11 @@ public class Worker : BackgroundService
         }
     }
 
+    private readonly string[] _searchTerms = new[]
+    {
+        "su", "nutella", "çay", "kahve", "makarna", "zeytinyağı", "peynir", "yumurta"
+    };
+
     private async Task RunScrapeAsync()
     {
         var httpClient1 = new HttpClient();
@@ -37,34 +42,53 @@ public class Worker : BackgroundService
         var httpClient2 = new HttpClient();
         var macroCenterScraper = new MacroCenterScraper(httpClient2);
 
+        var httpClient3 = new HttpClient();
+        var marketFiyatiScraper = new MarketFiyatiScraper(httpClient3);
+
         var repo = new ProductRepository(_connectionString);
         var matchingService = new MatchingService(_connectionString);
 
-        string searchItem = "su";
         int savedCount = 0;
         int failedCount = 0;
 
-        var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
-        foreach (var product in migrosProducts)
+        foreach (var searchItem in _searchTerms)
         {
-            var savedId = await repo.SaveAsync("migros", product);
-            if (savedId is null) { failedCount++; continue; }
+            Logger.Log($"--- Searching '{searchItem}' ---");
 
-            var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
-            if (matched) savedCount++; else failedCount++;
+            var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
+            foreach (var product in migrosProducts)
+            {
+                var savedId = await repo.SaveAsync("migros", product);
+                if (savedId is null) { failedCount++; continue; }
+
+                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+                if (matched) savedCount++; else failedCount++;
+            }
+
+            var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
+            foreach (var product in macroProducts)
+            {
+                var savedId = await repo.SaveAsync("macrocenter", product);
+                if (savedId is null) { failedCount++; continue; }
+
+                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+                if (matched) savedCount++; else failedCount++;
+            }
+
+            var marketFiyatiProducts = await marketFiyatiScraper.FetchProductsAsync(searchItem);
+            foreach (var product in marketFiyatiProducts)
+            {
+                var savedId = await repo.SaveAsync("marketfiyati", product);
+                if (savedId is null) { failedCount++; continue; }
+
+                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+                if (matched) savedCount++; else failedCount++;
+            }
+
+            // Small delay between search terms to avoid hammering the sites back-to-back
+            //await Task.Delay(TimeSpan.FromSeconds(3));
         }
 
-        var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
-        foreach (var product in macroProducts)
-        {
-            var savedId = await repo.SaveAsync("macrocenter", product);
-            if (savedId is null) { failedCount++; continue; }
-
-            var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
-            if (matched) savedCount++; else failedCount++;
-        }
-
-        Logger.Log($"Migros fetched: {migrosProducts.Count}, Macrocenter fetched: {macroProducts.Count}");
         Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
     }
 }
