@@ -48,12 +48,12 @@ public class MatchingService
         }
         catch (SqlException ex)
         {
-            Console.WriteLine($"[Matching] DB error matching product {productId} ('{title}'): {ex.Message}");
+            Logger.Log($"[Matching] DB error matching product {productId} ('{title}'): {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Matching] Unexpected error matching product {productId} ('{title}'): {ex.Message}");
+            Logger.Log($"[Matching] Unexpected error matching product {productId} ('{title}'): {ex.Message}");
             return false;
         }
     }

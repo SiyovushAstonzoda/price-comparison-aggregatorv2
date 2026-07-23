@@ -31,7 +31,7 @@ public class MacroCenterScraper
             if (!json.RootElement.TryGetProperty("data", out var data) ||
                 !data.TryGetProperty("storeProductInfos", out var products))
             {
-                Console.WriteLine("[Migros] Unexpected response shape — no products found.");
+                Logger.Log("[Migros] Unexpected response shape — no products found.");
                 return results;
             }
 
@@ -43,21 +43,21 @@ public class MacroCenterScraper
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[Migros] Skipped one product due to parse error: {ex.Message}");
+                    Logger.Log($"[Migros] Skipped one product due to parse error: {ex.Message}");
                 }
             }
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"[Migros] Network error: {ex.Message}");
+            Logger.Log($"[Migros] Network error: {ex.Message}");
         }
         catch (TaskCanceledException)
         {
-            Console.WriteLine("[Migros] Request timed out.");
+            Logger.Log("[Migros] Request timed out.");
         }
         catch (JsonException ex)
         {
-            Console.WriteLine($"[Migros] Failed to parse JSON: {ex.Message}");
+            Logger.Log($"[Migros] Failed to parse JSON: {ex.Message}");
         }
 
         return results;

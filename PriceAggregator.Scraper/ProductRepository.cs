@@ -42,7 +42,7 @@ public class ProductRepository
         }
         catch (SqlException ex)
         {
-            Console.WriteLine($"[DB] Failed to save product '{product.Title}' ({source}): {ex.Message}");
+            Logger.Log($"[DB] Failed to save product '{product.Title}' ({source}): {ex.Message}");
             return null;
         }
     }

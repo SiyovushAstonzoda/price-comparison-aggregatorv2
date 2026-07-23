@@ -45,5 +45,5 @@ foreach (var product in macroProducts)
     else failedCount++;
 }
 
-Console.WriteLine($"Done. Migros fetched: {migrosProducts.Count}, Macrocenter fetched: {macroProducts.Count}");
-Console.WriteLine($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
+Logger.Log($"Done. Migros fetched: {migrosProducts.Count}, Macrocenter fetched: {macroProducts.Count}");
+Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
