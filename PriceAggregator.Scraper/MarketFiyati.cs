@@ -7,6 +7,29 @@ public class MarketFiyatiScraper
 {
     private readonly HttpClient _httpClient;
 
+            public string GenerateSlug(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return string.Empty;
+
+            // 1. Convert to lowercase invariant to handle culture-specific casing safely
+            title = title.ToLowerInvariant();
+
+            // 2. Replace common Turkish/special characters
+            title = title.Replace("ı", "i").Replace("ğ", "g").Replace("ü", "u").Replace("ş", "s").Replace("ö", "o").Replace("ç", "c");
+
+            // 3. Remove all characters that are not lowercase alphanumeric, spaces, or hyphens
+            title = System.Text.RegularExpressions.Regex.Replace(title, @"[^a-z0-9\s-]", "");
+
+            // 4. Clean up multiple spaces and hyphens into a single space
+            title = System.Text.RegularExpressions.Regex.Replace(title, @"[\s-]+", " ").Trim();
+
+            // 5. Replace the remaining single spaces with hyphens
+            title = title.Replace(" ", "-");
+
+            return title;
+        }
+
     public MarketFiyatiScraper(HttpClient httpClient)
     {
         _httpClient = httpClient;
@@ -89,7 +112,7 @@ public class MarketFiyatiScraper
 
                 RegularPrice = price,
 
-                ProductUrl = ""
+                ProductUrl = $"https://marketfiyati.org.tr/detay/{p.GetProperty("id").GetString()}/{GenerateSlug(p.GetProperty("title").GetString() ?? "")}"
             });
         }
 

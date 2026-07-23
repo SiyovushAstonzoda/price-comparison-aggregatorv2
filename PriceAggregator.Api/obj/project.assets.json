@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net10.0": {
       "Dapper/2.1.79": {
@@ -879,29 +879,29 @@
     ]
   },
   "packageFolders": {
-    "/Users/siyovushastonzoda/.nuget/packages/": {}
+    "/Users/sariadarkazanli/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/PriceAggregator.Api.csproj",
+      "projectUniqueName": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj",
       "projectName": "PriceAggregator.Api",
-      "projectPath": "/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/PriceAggregator.Api.csproj",
-      "packagesPath": "/Users/siyovushastonzoda/.nuget/packages/",
-      "outputPath": "/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/",
+      "projectPath": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj",
+      "packagesPath": "/Users/sariadarkazanli/.nuget/packages/",
+      "outputPath": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/siyovushastonzoda/.nuget/NuGet/NuGet.Config"
+        "/Users/sariadarkazanli/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "/opt/homebrew/Cellar/dotnet/10.0.102/libexec/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -916,10 +916,11 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "Dapper": {
@@ -954,7 +955,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet/10.0.102/libexec/sdk/10.0.102/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
