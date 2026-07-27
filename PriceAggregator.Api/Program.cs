@@ -17,6 +17,12 @@ var app = builder.Build();
 app.UseCors("AllowFrontend");
 
 var frontendPath = Path.Combine(builder.Environment.ContentRootPath, "Frontend");
+var distPath = Path.Combine(frontendPath, "dist");
+if (Directory.Exists(distPath))
+{
+    frontendPath = distPath;
+}
+
 app.UseDefaultFiles(new DefaultFilesOptions
 {
     FileProvider = new PhysicalFileProvider(frontendPath)
@@ -71,9 +77,9 @@ app.MapGet("/api/products", async (
 
     var sql = $@"
         SELECT mp.Id, mp.CanonicalTitle, mp.Brand,
-               MIN(p.Price) AS LowestPrice,
-               COUNT(p.Id) AS OfferCount,
-               MAX(p.ImageUrl) AS ImageUrl
+                MIN(p.Price) AS LowestPrice,
+                COUNT(p.Id) AS OfferCount,
+                MAX(p.ImageUrl) AS ImageUrl
         FROM MasterProducts mp
         JOIN Products p ON p.MasterProductId = mp.Id
         WHERE 1=1";
