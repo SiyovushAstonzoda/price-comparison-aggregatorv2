@@ -1,9 +1,9 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Allow your frontend (running on a different port/file) to call this API
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -16,7 +16,29 @@ var app = builder.Build();
 
 app.UseCors("AllowFrontend");
 
+var frontendPath = Path.Combine(builder.Environment.ContentRootPath, "Frontend");
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    FileProvider = new PhysicalFileProvider(frontendPath)
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(frontendPath)
+});
+
 string connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
+
+app.MapGet("/api/brands", async () =>
+{
+    using var db = new SqlConnection(connectionString);
+    var brands = await db.QueryAsync<string>(@"
+        SELECT DISTINCT mp.Brand
+        FROM MasterProducts mp
+        JOIN Products p ON p.MasterProductId = mp.Id
+        WHERE mp.Brand IS NOT NULL AND mp.Brand <> ''
+        ORDER BY mp.Brand");
+    return Results.Ok(brands);
+});
 
 app.MapGet("/api/products/{masterId}", async (int masterId) =>
 {
@@ -32,36 +54,63 @@ app.MapGet("/api/products/{masterId}", async (int masterId) =>
     return Results.Ok(offers);
 });
 
-app.MapGet("/api/products", async () =>
+app.MapGet("/api/products", async (
+    string? q,
+    string? brand,
+    string? sort,
+    decimal? minPrice,
+    decimal? maxPrice) =>
 {
-    using var db = new SqlConnection(connectionString);
-    var masterProducts = await db.QueryAsync(@"
+    var orderBy = sort switch
+    {
+        "price_desc" => "LowestPrice DESC",
+        "price_asc" => "LowestPrice ASC",
+        "name_desc" => "CanonicalTitle DESC",
+        _ => "CanonicalTitle ASC"
+    };
+
+    var sql = $@"
         SELECT mp.Id, mp.CanonicalTitle, mp.Brand,
                MIN(p.Price) AS LowestPrice,
-               COUNT(p.Id) AS OfferCount
+               COUNT(p.Id) AS OfferCount,
+               MAX(p.ImageUrl) AS ImageUrl
         FROM MasterProducts mp
         JOIN Products p ON p.MasterProductId = mp.Id
-        GROUP BY mp.Id, mp.CanonicalTitle, mp.Brand
-        ORDER BY mp.CanonicalTitle");
+        WHERE 1=1";
 
+    var parameters = new DynamicParameters();
+
+    if (!string.IsNullOrWhiteSpace(q))
+    {
+        sql += " AND (mp.CanonicalTitle LIKE @Query OR mp.Brand LIKE @Query)";
+        parameters.Add("Query", $"%{q.Trim()}%");
+    }
+
+    if (!string.IsNullOrWhiteSpace(brand))
+    {
+        sql += " AND mp.Brand = @Brand";
+        parameters.Add("Brand", brand);
+    }
+
+    sql += " GROUP BY mp.Id, mp.CanonicalTitle, mp.Brand";
+
+    if (minPrice.HasValue)
+    {
+        sql += " HAVING MIN(p.Price) >= @MinPrice";
+        parameters.Add("MinPrice", minPrice.Value);
+    }
+
+    if (maxPrice.HasValue)
+    {
+        sql += minPrice.HasValue ? " AND MIN(p.Price) <= @MaxPrice" : " HAVING MIN(p.Price) <= @MaxPrice";
+        parameters.Add("MaxPrice", maxPrice.Value);
+    }
+
+    sql += $" ORDER BY {orderBy}";
+
+    using var db = new SqlConnection(connectionString);
+    var masterProducts = await db.QueryAsync(sql, parameters);
     return Results.Ok(masterProducts);
-});
-
-app.MapGet("/api/products/search", async (string q) =>
-{
-    using var db = new SqlConnection(connectionString);
-    var results = await db.QueryAsync(@"
-        SELECT mp.Id, mp.CanonicalTitle, mp.Brand,
-               MIN(p.Price) AS LowestPrice,
-               COUNT(p.Id) AS OfferCount
-        FROM MasterProducts mp
-        JOIN Products p ON p.MasterProductId = mp.Id
-        WHERE mp.CanonicalTitle LIKE @Query
-        GROUP BY mp.Id, mp.CanonicalTitle, mp.Brand
-        ORDER BY mp.CanonicalTitle",
-        new { Query = $"%{q}%" });
-
-    return Results.Ok(results);
 });
 
 app.Run();

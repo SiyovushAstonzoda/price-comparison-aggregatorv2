@@ -49,6 +49,14 @@ namespace PriceAggregator.Core
                     string title = p.GetProperty("name").GetString() ?? "";
                     string? imageUrl = p.TryGetProperty("imageUrl", out var imgProp) ? imgProp.GetString() : null;
 
+                    string? brand = p.TryGetProperty("brand", out var brandEl) && brandEl.ValueKind == JsonValueKind.Object
+                        ? (brandEl.TryGetProperty("name", out var brandName) ? brandName.GetString() : null)
+                        : null;
+
+                    string? barcode = p.TryGetProperty("barcode", out var barcodeEl) && barcodeEl.ValueKind == JsonValueKind.String
+                        ? barcodeEl.GetString()
+                        : null;
+
                     decimal price = p.GetProperty("price").GetDecimal();
                     decimal regularPrice = price;
 
@@ -64,6 +72,8 @@ namespace PriceAggregator.Core
                     {
                         ExternalId = externalId,
                         Title = title,
+                        Brand = brand,
+                        Barcode = barcode,
                         ImageUrl = imageUrl,
                         Price = price,
                         RegularPrice = regularPrice,

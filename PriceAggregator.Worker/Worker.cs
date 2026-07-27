@@ -45,6 +45,22 @@ public class Worker : BackgroundService
         var httpClient3 = new HttpClient();
         var marketFiyatiScraper = new MarketFiyatiScraper(httpClient3);
 
+        var httpClient6 = new HttpClient();
+        var hakmarExpressScraper = new HakmarExpressScraper(httpClient6);
+
+        // var httpClient8 = new HttpClient();
+        // var cagriMarketScraper = new CagriMarketScraper(httpClient8);
+
+        // var httpClient4 = new HttpClient();
+        // var evideaScraper = new EvideaScraper(httpClient4);
+
+        // var httpClient5 = new HttpClient();
+        // var mionScraper = new MionScraper(httpClient5);
+
+        // var httpClient7 = new HttpClient();
+        // var ikeaScraper = new IkeaScraper(httpClient7);
+
+
         var repo = new ProductRepository(_connectionString);
         var matchingService = new MatchingService(_connectionString);
 
@@ -55,40 +71,57 @@ public class Worker : BackgroundService
         {
             Logger.Log($"--- Searching '{searchItem}' ---");
 
-            var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
-            foreach (var product in migrosProducts)
-            {
-                var savedId = await repo.SaveAsync("migros", product);
-                if (savedId is null) { failedCount++; continue; }
+            var migrosRes = await RunScraperSafe("migros", () => migrosScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += migrosRes.saved; failedCount += migrosRes.failed;
 
-                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
-                if (matched) savedCount++; else failedCount++;
-            }
+            var macroRes = await RunScraperSafe("macrocenter", () => macroCenterScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += macroRes.saved; failedCount += macroRes.failed;
 
-            var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
-            foreach (var product in macroProducts)
-            {
-                var savedId = await repo.SaveAsync("macrocenter", product);
-                if (savedId is null) { failedCount++; continue; }
+            var marketFiyatiRes = await RunScraperSafe("marketfiyati", () => marketFiyatiScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += marketFiyatiRes.saved; failedCount += marketFiyatiRes.failed;
 
-                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
-                if (matched) savedCount++; else failedCount++;
-            }
+            // var evideaRes = await RunScraperSafe("evidea", () => evideaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            // savedCount += evideaRes.saved; failedCount += evideaRes.failed;
 
-            var marketFiyatiProducts = await marketFiyatiScraper.FetchProductsAsync(searchItem);
-            foreach (var product in marketFiyatiProducts)
-            {
-                var savedId = await repo.SaveAsync("marketfiyati", product);
-                if (savedId is null) { failedCount++; continue; }
+            // var mionRes = await RunScraperSafe("mion", () => mionScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            // savedCount += mionRes.saved; failedCount += mionRes.failed;
 
-                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
-                if (matched) savedCount++; else failedCount++;
-            }
+            var hakmarRes = await RunScraperSafe("hakmarexpress", () => hakmarExpressScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += hakmarRes.saved; failedCount += hakmarRes.failed;
+
+            // var ikeaRes = await RunScraperSafe("ikea", () => ikeaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            // savedCount += ikeaRes.saved; failedCount += ikeaRes.failed;
+
+            // var cagriRes = await RunScraperSafe("cagrimarket", () => cagriMarketScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            // savedCount += cagriRes.saved; failedCount += cagriRes.failed;
 
             // Small delay between search terms to avoid hammering the sites back-to-back
             //await Task.Delay(TimeSpan.FromSeconds(3));
         }
 
         Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
+    }
+
+    private async Task<(int saved, int failed)> RunScraperSafe(string scraperName, Func<Task<List<ProductDto>>> fetchFunc, ProductRepository repo, MatchingService matchingService, string searchItem)
+    {
+        int saved = 0;
+        int failed = 0;
+        try
+        {
+            var products = await fetchFunc();
+            foreach (var product in products)
+            {
+                var savedId = await repo.SaveAsync(scraperName, product);
+                if (savedId is null) { failed++; continue; }
+
+                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+                if (matched) saved++; else failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Log($"[{scraperName}] Error searching '{searchItem}': {ex.Message}");
+        }
+        return (saved, failed);
     }
 }
