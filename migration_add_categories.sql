@@ -142,10 +142,94 @@ WHERE mp.CategoryId IS NULL AND (
 );
 
 UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'market-sut-kahvaltilik'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%fındık kreması%' OR mp.CanonicalTitle LIKE N'%çikolata kreması%' OR
+    mp.CanonicalTitle LIKE N'%kakaolu%' OR mp.CanonicalTitle LIKE N'%nutella%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
 FROM MasterProducts mp JOIN Categories c ON c.Slug = N'kozmetik-cilt-bakimi'
 WHERE mp.CategoryId IS NULL AND (
-    mp.CanonicalTitle LIKE N'%krem%' OR mp.CanonicalTitle LIKE N'%serum%' OR
-    mp.CanonicalTitle LIKE N'%nemlendirici%' OR mp.CanonicalTitle LIKE N'%cilt%'
+    (
+        mp.CanonicalTitle LIKE N'%krem%' OR mp.CanonicalTitle LIKE N'%serum%' OR
+        mp.CanonicalTitle LIKE N'%nemlendirici%' OR mp.CanonicalTitle LIKE N'%cilt%'
+    )
+    -- Gıda ürünlerinin (fındık kreması, çikolata kreması vb.) yanlışlıkla
+    -- cilt bakımına düşmesini engelle
+    AND mp.CanonicalTitle NOT LIKE N'%fındık%'
+    AND mp.CanonicalTitle NOT LIKE N'%çikolata%'
+    AND mp.CanonicalTitle NOT LIKE N'%kakao%'
+    AND mp.CanonicalTitle NOT LIKE N'%karamel%'
+    AND mp.CanonicalTitle NOT LIKE N'%muz%'
+    AND mp.CanonicalTitle NOT LIKE N'%vanilya%'
+);
+
+-- ============================================================
+-- Mobilya alt kategorileri: anahtar kelime eşleştirmesi
+-- ============================================================
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-oturma-odasi'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%koltuk%' OR mp.CanonicalTitle LIKE N'%kanepe%' OR
+    mp.CanonicalTitle LIKE N'%sehpa%' OR mp.CanonicalTitle LIKE N'%berjer%' OR
+    mp.CanonicalTitle LIKE N'%puf%' OR mp.CanonicalTitle LIKE N'%tv ünitesi%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-yatak-odasi'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%yatak%' OR mp.CanonicalTitle LIKE N'%gardırop%' OR
+    mp.CanonicalTitle LIKE N'%şifonyer%' OR mp.CanonicalTitle LIKE N'%komodin%' OR
+    mp.CanonicalTitle LIKE N'%baza%' OR mp.CanonicalTitle LIKE N'%yatak odası%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-mutfak-yemek'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%yemek masası%' OR mp.CanonicalTitle LIKE N'%sandalye%' OR
+    mp.CanonicalTitle LIKE N'%mutfak dolabı%' OR mp.CanonicalTitle LIKE N'%bar taburesi%' OR
+    mp.CanonicalTitle LIKE N'%mutfak masası%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-ofis'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%ofis koltuğu%' OR mp.CanonicalTitle LIKE N'%çalışma masası%' OR
+    mp.CanonicalTitle LIKE N'%ofis sandalyesi%' OR mp.CanonicalTitle LIKE N'%bilgisayar masası%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-bahce-balkon'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%bahçe mobilyası%' OR mp.CanonicalTitle LIKE N'%şezlong%' OR
+    mp.CanonicalTitle LIKE N'%bahçe koltuğu%' OR mp.CanonicalTitle LIKE N'%balkon takımı%' OR
+    mp.CanonicalTitle LIKE N'%bahçe masası%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-depolama'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%raf%' OR mp.CanonicalTitle LIKE N'%dolap%' OR
+    mp.CanonicalTitle LIKE N'%kutu organizer%' OR mp.CanonicalTitle LIKE N'%saklama kutusu%' OR
+    mp.CanonicalTitle LIKE N'%ayakkabılık%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-aydinlatma'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%avize%' OR mp.CanonicalTitle LIKE N'%aplik%' OR
+    mp.CanonicalTitle LIKE N'%lamba%' OR mp.CanonicalTitle LIKE N'%abajur%' OR
+    mp.CanonicalTitle LIKE N'%led şerit%'
+);
+
+UPDATE mp SET mp.CategoryId = c.Id
+FROM MasterProducts mp JOIN Categories c ON c.Slug = N'mobilya-dekorasyon'
+WHERE mp.CategoryId IS NULL AND (
+    mp.CanonicalTitle LIKE N'%halı%' OR mp.CanonicalTitle LIKE N'%ayna%' OR
+    mp.CanonicalTitle LIKE N'%perde%' OR mp.CanonicalTitle LIKE N'%tablo%' OR
+    mp.CanonicalTitle LIKE N'%vazo%' OR mp.CanonicalTitle LIKE N'%duvar saati%'
 );
 
 UPDATE mp SET mp.CategoryId = c.Id
