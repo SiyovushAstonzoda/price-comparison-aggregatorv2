@@ -3,97 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tutumlu — Fiyat Karşılaştırma</title>
+    <title>Tutumlu — Akıllı Fiyat Karşılaştırma</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a href="/" class="logo">
-          <span class="logo-icon">₺</span>
-          <span class="logo-text">Tutumlu</span>
-        </a>
-        <form id="searchForm" class="search-bar" role="search">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Ürün veya marka ara..."
-            autocomplete="off"
-          />
-          <button type="submit" class="search-btn">Ara</button>
-        </form>
-      </div>
-    </header>
-
-    <main class="main-content">
-      <aside class="filters-panel">
-        <div class="filters-header">
-          <h2>Filtreler</h2>
-          <button id="clearFilters" class="clear-btn" type="button">Temizle</button>
-        </div>
-
-        <div class="filter-group">
-          <label for="brandFilter">Marka</label>
-          <select id="brandFilter">
-            <option value="">Tüm markalar</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="sortFilter">Sıralama</label>
-          <select id="sortFilter">
-            <option value="name">İsme göre (A–Z)</option>
-            <option value="name_desc">İsme göre (Z–A)</option>
-            <option value="price_asc">Fiyat (Düşük → Yüksek)</option>
-            <option value="price_desc">Fiyat (Yüksek → Düşük)</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label>Fiyat aralığı (TL)</label>
-          <div class="price-range">
-            <input id="minPrice" type="number" placeholder="Min" min="0" step="0.01" />
-            <span class="range-sep">—</span>
-            <input id="maxPrice" type="number" placeholder="Max" min="0" step="0.01" />
-          </div>
-        </div>
-
-        <button id="applyFilters" class="apply-btn" type="button">Filtreleri Uygula</button>
-      </aside>
-
-      <section class="products-section">
-        <div class="results-bar">
-          <p id="resultsCount" class="results-count"></p>
-          <div id="activeFilters" class="active-filters"></div>
-        </div>
-        <div id="products" class="product-grid"></div>
-      </section>
-    </main>
-
-    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-      <div class="modal-backdrop"></div>
-      <div class="modal-content">
-        <button id="closeModal" class="modal-close" aria-label="Kapat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-        <h2 id="modalTitle" class="modal-title"></h2>
-        <p class="modal-subtitle">Mağaza fiyatları</p>
-        <div id="offers" class="offers-list"></div>
-      </div>
-    </div>
-
-    <script src="app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
