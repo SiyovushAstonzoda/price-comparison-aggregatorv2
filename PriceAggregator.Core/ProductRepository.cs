@@ -18,15 +18,16 @@ public class ProductRepository
         {
             using var db = new SqlConnection(_connectionString);
             var id = await db.QuerySingleAsync<int>(@"
-        MERGE Products AS target
-        USING (SELECT @Source AS Source, @ExternalId AS ExternalId) AS src
-        ON target.Source = src.Source AND target.ExternalId = src.ExternalId
-        WHEN MATCHED THEN
-            UPDATE SET Title=@Title, ImageUrl=@ImageUrl, Price=@Price, RegularPrice=@RegularPrice, LastUpdated=GETDATE()
-        WHEN NOT MATCHED THEN
-            INSERT (Source, ExternalId, Title, ImageUrl, Price, RegularPrice, ProductUrl, LastUpdated)
-            VALUES (@Source, @ExternalId, @Title, @ImageUrl, @Price, @RegularPrice, @ProductUrl, GETDATE())
-        OUTPUT INSERTED.Id;",
+            MERGE Products AS target
+            USING (SELECT @Source AS Source, @ExternalId AS ExternalId) AS src
+            ON target.Source = src.Source AND target.ExternalId = src.ExternalId
+            WHEN MATCHED THEN
+                UPDATE SET Title=@Title, ImageUrl=@ImageUrl, Price=@Price, RegularPrice=@RegularPrice,
+                           SourceCategory=@SourceCategory, LastUpdated=GETDATE()
+            WHEN NOT MATCHED THEN
+                INSERT (Source, ExternalId, Title, ImageUrl, Price, RegularPrice, ProductUrl, SourceCategory, LastUpdated)
+                VALUES (@Source, @ExternalId, @Title, @ImageUrl, @Price, @RegularPrice, @ProductUrl, @SourceCategory, GETDATE())
+            OUTPUT INSERTED.Id;",
                 new
                 {
                     Source = source,
@@ -35,7 +36,8 @@ public class ProductRepository
                     product.ImageUrl,
                     product.Price,
                     product.RegularPrice,
-                    product.ProductUrl
+                    product.ProductUrl,
+                    product.SourceCategory
                 });
 
             return id;

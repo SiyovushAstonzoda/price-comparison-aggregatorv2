@@ -88,6 +88,7 @@ public class MarketFiyatiScraper
                 ImageUrl = p.TryGetProperty("imageUrl", out var image) ? image.GetString() : null,
                 Price = price,
                 RegularPrice = price,
+                SourceCategory = p.TryGetProperty("main_category", out var mainCat) ? mainCat.GetString() : null,
                 ProductUrl = $"https://marketfiyati.org.tr/detay/{idString}/{GenerateSlug(p.GetProperty("title").GetString() ?? "")}"
             });
         }

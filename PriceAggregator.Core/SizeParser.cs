@@ -22,28 +22,37 @@ public static class SizeParser
 
     public static (decimal? value, string? unit, int packQuantity) ExtractSize(string title)
     {
-        // "N x SIZE UNIT" pattern (e.g. "12 x 500 Ml")
-        var packMatch = Regex.Match(title, $@"(\d+)\s*x\s*(\d+[.,]?\d*)\s*({UnitPattern})\b", RegexOptions.IgnoreCase);
-        if (packMatch.Success)
+        // Pattern A: "N x SIZE UNIT" — multiplier BEFORE size (e.g. "12 x 500 Ml")
+        var packBefore = Regex.Match(title, $@"(\d+)\s*x\s*(\d+[.,]?\d*)\s*({UnitPattern})\b", RegexOptions.IgnoreCase);
+        if (packBefore.Success)
         {
-            var packQty = int.Parse(packMatch.Groups[1].Value);
-            var (value, unit) = Normalize(packMatch.Groups[2].Value, packMatch.Groups[3].Value);
+            var packQty = int.Parse(packBefore.Groups[1].Value);
+            var (value, unit) = Normalize(packBefore.Groups[2].Value, packBefore.Groups[3].Value);
             return (value, unit, packQty);
         }
 
-        // Weight/volume pattern (e.g. "500 Ml", "1 Kg")
-        var singleMatch = Regex.Match(title, $@"(\d+[.,]?\d*)\s*({UnitPattern})\b", RegexOptions.IgnoreCase);
-        if (singleMatch.Success)
+        var sizeMatch = Regex.Match(title, $@"(\d+[.,]?\d*)\s*({UnitPattern})\b", RegexOptions.IgnoreCase);
+        var countSuffix = Regex.Match(title, @"(\d+)\s*'?\s*(?:li|lı|lu|lü|adet)\b", RegexOptions.IgnoreCase);
+
+        // Pattern B: SIZE UNIT ... N'li — multiplier AFTER size (e.g. "2 Gr 25'li")
+        if (sizeMatch.Success && countSuffix.Success)
         {
-            var (value, unit) = Normalize(singleMatch.Groups[1].Value, singleMatch.Groups[2].Value);
+            var (value, unit) = Normalize(sizeMatch.Groups[1].Value, sizeMatch.Groups[2].Value);
+            var packQty = int.Parse(countSuffix.Groups[1].Value);
+            return (value, unit, packQty);
+        }
+
+        // Pattern C: just a weight/volume, no separate pack count
+        if (sizeMatch.Success)
+        {
+            var (value, unit) = Normalize(sizeMatch.Groups[1].Value, sizeMatch.Groups[2].Value);
             return (value, unit, 1);
         }
 
-        // Count pattern: "12 Adet", "12'li", "15'Li" — for items sold by piece, not weight
-        var countMatch = Regex.Match(title, @"(\d+)\s*(?:adet\b|'[lL][iİuü])", RegexOptions.IgnoreCase);
-        if (countMatch.Success)
+        // Pattern D: pure count, no weight at all (e.g. "48'li" tea bags with no per-bag gram listed)
+        if (countSuffix.Success)
         {
-            var count = decimal.Parse(countMatch.Groups[1].Value);
+            var count = decimal.Parse(countSuffix.Groups[1].Value);
             return (count, "ADET", 1);
         }
 

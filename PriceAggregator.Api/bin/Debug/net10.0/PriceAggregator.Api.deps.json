@@ -10,7 +10,8 @@
         "dependencies": {
           "Dapper": "2.1.79",
           "Microsoft.AspNetCore.OpenApi": "10.0.2",
-          "Microsoft.Data.SqlClient": "7.0.2"
+          "Microsoft.Data.SqlClient": "7.0.2",
+          "PriceAggregator.Core": "1.0.0"
         },
         "runtime": {
           "PriceAggregator.Api.dll": {}
@@ -264,6 +265,18 @@
             "fileVersion": "9.0.1326.6317"
           }
         }
+      },
+      "PriceAggregator.Core/1.0.0": {
+        "dependencies": {
+          "Dapper": "2.1.79",
+          "Microsoft.Data.SqlClient": "7.0.2"
+        },
+        "runtime": {
+          "PriceAggregator.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -398,6 +411,11 @@
       "sha512": "sha512-t8S9IDpjJKsLpLkeBdW8cWtcPyYqrGu93Dej1RO6WwuL/lkFSqWlan3rMJfortqz1mRIh+sys2AFsSA6jWJ3Jg==",
       "path": "system.security.cryptography.protecteddata/9.0.13",
       "hashPath": "system.security.cryptography.protecteddata.9.0.13.nupkg.sha512"
+    },
+    "PriceAggregator.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

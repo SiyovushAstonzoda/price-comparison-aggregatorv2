@@ -77,6 +77,11 @@ public class MigrosScraper
         if (p.TryGetProperty("brand", out var brandEl) && brandEl.TryGetProperty("name", out var brandName))
             brand = brandName.GetString();
 
+
+        string? sourceCategory = null;
+        if (p.TryGetProperty("category", out var catEl) && catEl.TryGetProperty("name", out var catName))
+            sourceCategory = catName.GetString();
+
         return new ProductDto
         {
             ExternalId = p.GetProperty("id").GetInt64(),
@@ -85,6 +90,7 @@ public class MigrosScraper
             ImageUrl = imageUrl,
             Price = p.TryGetProperty("shownPrice", out var price) ? price.GetInt32() / 100m : 0,
             RegularPrice = p.TryGetProperty("regularPrice", out var regPrice) ? regPrice.GetInt32() / 100m : 0,
+            SourceCategory = sourceCategory,
             ProductUrl = p.TryGetProperty("prettyName", out var pretty)
                 ? $"https://www.migros.com.tr/{pretty.GetString()}"
                 : ""

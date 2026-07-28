@@ -57,6 +57,13 @@ namespace PriceAggregator.Core
                         ? barcodeEl.GetString()
                         : null;
 
+                    string? sourceCategory = null;
+                    if (p.TryGetProperty("categories", out var cats) && cats.ValueKind == JsonValueKind.Array && cats.GetArrayLength() > 0)
+                    {
+                        var lastCat = cats[cats.GetArrayLength() - 1];
+                        sourceCategory = lastCat.TryGetProperty("name", out var n) ? n.GetString() : null;
+                    }
+
                     decimal price = p.GetProperty("price").GetDecimal();
                     decimal regularPrice = price;
 
@@ -77,6 +84,7 @@ namespace PriceAggregator.Core
                         ImageUrl = imageUrl,
                         Price = price,
                         RegularPrice = regularPrice,
+                        SourceCategory = sourceCategory,
                         ProductUrl = productUrl
                     });
                 }

@@ -10,4 +10,5 @@ public class ProductDto
     public string ProductUrl { get; set; } = "";
     public string Brand { get; set; }
     public string? Barcode { get; set; }
+    public string? SourceCategory { get; set; }
 }

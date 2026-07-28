@@ -1,6 +1,7 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.FileProviders;
+using PriceAggregator.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,12 @@ var app = builder.Build();
 app.UseCors("AllowFrontend");
 
 var frontendPath = Path.Combine(builder.Environment.ContentRootPath, "Frontend");
+var distPath = Path.Combine(frontendPath, "dist");
+if (Directory.Exists(distPath))
+{
+    frontendPath = distPath;
+}
+
 app.UseDefaultFiles(new DefaultFilesOptions
 {
     FileProvider = new PhysicalFileProvider(frontendPath)
@@ -113,4 +120,72 @@ app.MapGet("/api/products", async (
     return Results.Ok(masterProducts);
 });
 
+app.MapGet("/api/deals", async (string q) =>
+{
+    using var db = new SqlConnection(connectionString);
+    var category = CategoryMapper.Resolve(q, null);
+
+    var rows = await db.QueryAsync<DealRow>(@"
+        SELECT mp.Id AS MasterProductId, mp.CanonicalTitle, mp.Brand,
+               mp.SizeValue, mp.SizeUnit, mp.PackQuantity,
+               p.Source, p.Price, p.ImageUrl, p.ProductUrl
+        FROM MasterProducts mp
+        JOIN Products p ON p.MasterProductId = mp.Id
+        WHERE mp.CanonicalCategory = @Category",
+        new { Category = category });
+
+    var withUnitPrice = rows.Select(r => new
+    {
+        r.MasterProductId,
+        r.CanonicalTitle,
+        r.Brand,
+        r.Source,
+        r.Price,
+        r.ImageUrl,
+        r.ProductUrl,
+        r.SizeUnit,
+        TotalSize = (r.SizeValue ?? 0) * r.PackQuantity,
+        PricePerUnit = (r.SizeValue is null or 0) ? (decimal?)null
+            : r.Price / ((r.SizeValue.Value * r.PackQuantity) / (r.SizeUnit == "G" || r.SizeUnit == "ML" ? 1000m : 1m))
+    }).Where(r => r.PricePerUnit != null).ToList();
+
+    if (withUnitPrice.Count == 0)
+        return Results.Ok(Array.Empty<object>());
+
+    // Rank ONLY within the dominant unit type for this category (weight or volume),
+    // since mixing "price per kg" with "price per piece" isn't a valid comparison.
+    var weightOrVolume = withUnitPrice.Where(r => r.SizeUnit == "G" || r.SizeUnit == "ML").ToList();
+    var byCount = withUnitPrice.Where(r => r.SizeUnit == "ADET").ToList();
+
+    var primaryGroup = weightOrVolume.Count >= byCount.Count ? weightOrVolume : byCount;
+    var secondaryGroup = weightOrVolume.Count >= byCount.Count ? byCount : weightOrVolume;
+
+    var sortedSizes = primaryGroup.Select(r => r.TotalSize).OrderBy(s => s).ToList();
+    var median = sortedSizes.Count > 0 ? sortedSizes[sortedSizes.Count / 2] : 0;
+    var cap = median * 3;
+
+    var filteredPrimary = primaryGroup.Where(r => cap == 0 || r.TotalSize <= cap)
+        .OrderBy(r => r.PricePerUnit).ToList();
+
+    return Results.Ok(new
+    {
+        primaryUnit = weightOrVolume.Count >= byCount.Count ? "weight_or_volume" : "count",
+        results = filteredPrimary,
+        // count-based (or weight/volume) items shown separately, not ranked against primary
+        otherUnitResults = secondaryGroup.OrderBy(r => r.PricePerUnit).ToList()
+    });
+});
+
 app.Run();
+
+public record DealRow(
+    int MasterProductId,
+    string CanonicalTitle,
+    string? Brand,
+    decimal? SizeValue,
+    string? SizeUnit,
+    int PackQuantity,
+    string Source,
+    decimal Price,
+    string? ImageUrl,
+    string? ProductUrl);

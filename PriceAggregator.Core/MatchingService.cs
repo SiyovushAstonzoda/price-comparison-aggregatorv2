@@ -13,21 +13,28 @@ public class MatchingService
         _connectionString = connectionString;
     }
 
-    public async Task<bool> MatchProductAsync(int productId, string? brand, string title)
+    public async Task<bool> MatchProductAsync(int productId, string? brand, string title, string searchTerm, string? sourceCategory)
     {
         try
         {
+            if (CategoryMapper.IsLikelyFalsePositive(searchTerm, sourceCategory))
+            {
+                Logger.Log($"[Matching] Skipping likely false positive: '{title}' (category: {sourceCategory}) for search '{searchTerm}'");
+                return false;
+            }
+
             var safeBrand = string.IsNullOrWhiteSpace(brand) ? "Unknown" : brand;
             var (size, unit, packQty) = SizeParser.ExtractSize(title);
+            var canonicalCategory = CategoryMapper.Resolve(searchTerm, sourceCategory);
 
             using var db = new SqlConnection(_connectionString);
 
             var candidates = await db.QueryAsync<(int Id, string CanonicalTitle)>(@"
             SELECT Id, CanonicalTitle FROM MasterProducts
             WHERE Brand = @Brand
-            AND (SizeValue = @Size OR (SizeValue IS NULL AND @Size IS NULL))
-            AND (SizeUnit = @Unit OR (SizeUnit IS NULL AND @Unit IS NULL))
-            AND PackQuantity = @PackQty",
+              AND (SizeValue = @Size OR (SizeValue IS NULL AND @Size IS NULL))
+              AND (SizeUnit = @Unit OR (SizeUnit IS NULL AND @Unit IS NULL))
+              AND PackQuantity = @PackQty",
             new { Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty });
 
             int? bestMatchId = null;
@@ -48,14 +55,21 @@ public class MatchingService
             if (bestMatchId.HasValue && bestScore >= threshold)
             {
                 masterId = bestMatchId.Value;
+                // Backfill category if this master didn't have one yet
+                if (canonicalCategory != null)
+                {
+                    await db.ExecuteAsync(
+                        "UPDATE MasterProducts SET CanonicalCategory = COALESCE(@Cat, CanonicalCategory) WHERE Id = @Id",
+                        new { Cat = canonicalCategory, Id = masterId });
+                }
             }
             else
             {
                 masterId = await db.QuerySingleAsync<int>(@"
-                INSERT INTO MasterProducts (CanonicalTitle, Brand, SizeValue, SizeUnit, PackQuantity)
+                INSERT INTO MasterProducts (CanonicalTitle, Brand, SizeValue, SizeUnit, PackQuantity, CanonicalCategory)
                 OUTPUT INSERTED.Id
-                VALUES (@Title, @Brand, @Size, @Unit, @PackQty)",
-                new { Title = title, Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty });
+                VALUES (@Title, @Brand, @Size, @Unit, @PackQty, @Category)",
+                new { Title = title, Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty, Category = canonicalCategory });
             }
 
             await db.ExecuteAsync(
@@ -85,11 +99,27 @@ public class MatchingService
     {
         "pet", "sise", "su", "dogal", "kaynak", "sade"
     };
+    private static readonly Dictionary<string, string> ShapeAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["kalem"] = "penne rigate",
+        // ["fiyonk"] = "farfalle",
+        // ["burgu"] = "fusilli",
+    };
+
+    private string ApplyShapeAliases(string text)
+    {
+        foreach (var (alias, canonical) in ShapeAliases)
+        {
+            text = Regex.Replace(text, $@"\b{Regex.Escape(alias)}\b", canonical, RegexOptions.IgnoreCase);
+        }
+        return text;
+    }
 
     private HashSet<string> Tokenize(string text, string? brand)
     {
         if (string.IsNullOrWhiteSpace(text)) return new HashSet<string>();
 
+        text = ApplyShapeAliases(text);
         var normalized = TurkishNormalizer.Normalize(text);
         var cleaned = new string(normalized.Select(c =>
             char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) ? c : ' ').ToArray());
@@ -158,6 +188,31 @@ public class MatchingService
         var tokens2 = Tokenize(title2, brand);
 
         if (tokens1.Count == 0 && tokens2.Count == 0) return 1.0;
+        if (tokens1.Count == 0 || tokens2.Count == 0) return 1.0; // your existing empty-set rule (Erikli/pet-şişe case)
+
+        var remaining = new HashSet<string>(tokens2);
+        int matches = 0;
+
+        foreach (var t1 in tokens1)
+        {
+            var match = remaining.FirstOrDefault(t2 => TokensMatch(t1, t2));
+            if (match != null)
+            {
+                matches++;
+                remaining.Remove(match);
+            }
+        }
+
+        int union = tokens1.Count + tokens2.Count - matches;
+        return (double)matches / union;
+    }
+
+    /*private double CalculateSimilarity(string title1, string title2, string brand)
+    {
+        var tokens1 = Tokenize(title1, brand);
+        var tokens2 = Tokenize(title2, brand);
+
+        if (tokens1.Count == 0 && tokens2.Count == 0) return 1.0;
         if (tokens1.Count == 0 || tokens2.Count == 0) return 0.0;
 
         // Full containment: every token of the smaller set has a fuzzy match in the larger set,
@@ -187,5 +242,5 @@ public class MatchingService
 
         int union = tokens1.Count + tokens2.Count - matches;
         return (double)matches / union;
-    }
+    }*/
 }
