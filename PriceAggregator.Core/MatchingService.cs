@@ -7,17 +7,19 @@ namespace PriceAggregator.Core;
 public class MatchingService
 {
     private readonly string _connectionString;
+    private readonly CategoryMapper _categoryMapper;
 
     public MatchingService(string connectionString)
     {
         _connectionString = connectionString;
+        _categoryMapper = new CategoryMapper(connectionString);
     }
 
     public async Task<bool> MatchProductAsync(int productId, string? brand, string title, string searchTerm, string? sourceCategory)
     {
         try
         {
-            if (CategoryMapper.IsLikelyFalsePositive(searchTerm, sourceCategory))
+            if (await _categoryMapper.IsLikelyFalsePositiveAsync(searchTerm, sourceCategory))
             {
                 Logger.Log($"[Matching] Skipping likely false positive: '{title}' (category: {sourceCategory}) for search '{searchTerm}'");
                 return false;
@@ -25,17 +27,17 @@ public class MatchingService
 
             var safeBrand = string.IsNullOrWhiteSpace(brand) ? "Unknown" : brand;
             var (size, unit, packQty) = SizeParser.ExtractSize(title);
-            var canonicalCategory = CategoryMapper.Resolve(searchTerm, sourceCategory);
+            var canonicalCategoryId = await _categoryMapper.ResolveAsync(searchTerm, sourceCategory);
 
             using var db = new SqlConnection(_connectionString);
 
             var candidates = await db.QueryAsync<(int Id, string CanonicalTitle)>(@"
-            SELECT Id, CanonicalTitle FROM MasterProducts
-            WHERE Brand = @Brand
-              AND (SizeValue = @Size OR (SizeValue IS NULL AND @Size IS NULL))
-              AND (SizeUnit = @Unit OR (SizeUnit IS NULL AND @Unit IS NULL))
-              AND PackQuantity = @PackQty",
-            new { Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty });
+                SELECT Id, CanonicalTitle FROM MasterProducts
+                WHERE Brand = @Brand
+                  AND (SizeValue = @Size OR (SizeValue IS NULL AND @Size IS NULL))
+                  AND (SizeUnit = @Unit OR (SizeUnit IS NULL AND @Unit IS NULL))
+                  AND PackQuantity = @PackQty",
+                new { Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty });
 
             int? bestMatchId = null;
             double bestScore = 0.0;
@@ -55,21 +57,20 @@ public class MatchingService
             if (bestMatchId.HasValue && bestScore >= threshold)
             {
                 masterId = bestMatchId.Value;
-                // Backfill category if this master didn't have one yet
-                if (canonicalCategory != null)
+                if (canonicalCategoryId.HasValue)
                 {
                     await db.ExecuteAsync(
-                        "UPDATE MasterProducts SET CanonicalCategory = COALESCE(@Cat, CanonicalCategory) WHERE Id = @Id",
-                        new { Cat = canonicalCategory, Id = masterId });
+                        "UPDATE MasterProducts SET CanonicalCategoryId = ISNULL(CanonicalCategoryId, @CatId) WHERE Id = @Id",
+                        new { CatId = canonicalCategoryId, Id = masterId });
                 }
             }
             else
             {
                 masterId = await db.QuerySingleAsync<int>(@"
-                INSERT INTO MasterProducts (CanonicalTitle, Brand, SizeValue, SizeUnit, PackQuantity, CanonicalCategory)
-                OUTPUT INSERTED.Id
-                VALUES (@Title, @Brand, @Size, @Unit, @PackQty, @Category)",
-                new { Title = title, Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty, Category = canonicalCategory });
+                    INSERT INTO MasterProducts (CanonicalTitle, Brand, SizeValue, SizeUnit, PackQuantity, CanonicalCategoryId)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Title, @Brand, @Size, @Unit, @PackQty, @CategoryId)",
+                    new { Title = title, Brand = safeBrand, Size = size, Unit = unit, PackQty = packQty, CategoryId = canonicalCategoryId });
             }
 
             await db.ExecuteAsync(

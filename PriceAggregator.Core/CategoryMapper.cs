@@ -1,71 +1,53 @@
+using Dapper;
+using Microsoft.Data.SqlClient;
 
-public static class CategoryMapper
+namespace PriceAggregator.Core;
+
+public class CategoryMapper
 {
-    // Maps YOUR search keyword -> canonical category name
-    private static readonly Dictionary<string, string> KeywordToCategory = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["su"] = "Su",
-        ["çay"] = "Çay",
-        ["kahve"] = "Kahve",
-        ["makarna"] = "Makarna",
-        ["zeytinyağı"] = "Zeytinyağı",
-        ["peynir"] = "Peynir",
-        ["yumurta"] = "Yumurta",
-        ["süt"] = "Süt",
-        ["ekmek"] = "Ekmek",
-        ["nutella"] = "Kahvaltılık"
-    };
+    private readonly string _connectionString;
 
-    // Maps a RAW source category string -> canonical category name
-    // (grows as you see more raw category strings from different sources)
-    private static readonly Dictionary<string, string> RawCategoryToCategory = new(StringComparer.OrdinalIgnoreCase)
+    public CategoryMapper(string connectionString)
     {
-        ["su"] = "Su",
-        ["sular"] = "Su",
-        ["maden suyu"] = "Su",
-        ["sade sular"] = "Su",
-        ["su ve maden suyu"] = "Su",
-        ["su & maden suyu"] = "Su",
-        ["çamaşır suyu"] = "Temizlik",
-        ["çay"] = "Çay",
-        ["kahve"] = "Kahve",
-        ["makarna"] = "Makarna",
-    };
+        _connectionString = connectionString;
+    }
 
-    public static string? Resolve(string searchTerm, string? rawSourceCategory)
+    public async Task<int?> ResolveAsync(string searchTerm, string? rawSourceCategory)
     {
+        using var db = new SqlConnection(_connectionString);
+
         if (!string.IsNullOrWhiteSpace(rawSourceCategory))
         {
-            if (RawCategoryToCategory.TryGetValue(rawSourceCategory.Trim(), out var mapped))
-            {
-                return mapped;
-            }
+            var byRaw = await db.QuerySingleOrDefaultAsync<int?>(
+                "SELECT CategoryId FROM CategoryRawMap WHERE RawCategoryText = @Raw",
+                new { Raw = rawSourceCategory.Trim().ToLowerInvariant() });
 
-            // We DO have real category info, we just don't recognize this specific string yet.
-            // Don't blindly trust the search keyword here — that's exactly how mouthwash,
-            // sunscreen, and sucuk leaked into "Su" results. Leave it unclassified instead.
+            if (byRaw.HasValue) return byRaw;
+
+            // Real category info exists, we just don't recognize this specific string yet —
+            // don't blindly fall back to the keyword here (that's how bleach/mouthwash
+            // leaked into "su" results before).
             return null;
         }
 
-        // No category info available at all from this source — fall back to the
-        // search keyword as our best available guess.
-        if (KeywordToCategory.TryGetValue(searchTerm, out var fromKeyword))
-        {
-            return fromKeyword;
-        }
-
-        return null;
+        return await db.QuerySingleOrDefaultAsync<int?>(
+            "SELECT CategoryId FROM CategoryKeywordMap WHERE Keyword = @Keyword",
+            new { Keyword = searchTerm.ToLowerInvariant() });
     }
 
-    // Returns true if the source's own category actively CONTRADICTS the expected
-    // keyword-derived category — useful for filtering out false-positive search hits
-    // (e.g. "Domestos Çamaşır Suyu" matching a "su" search).
-    public static bool IsLikelyFalsePositive(string searchTerm, string? rawSourceCategory)
+    public async Task<bool> IsLikelyFalsePositiveAsync(string searchTerm, string? rawSourceCategory)
     {
         if (string.IsNullOrWhiteSpace(rawSourceCategory)) return false;
-        if (!KeywordToCategory.TryGetValue(searchTerm, out var expectedCategory)) return false;
 
-        var resolved = Resolve(searchTerm, rawSourceCategory);
-        return !string.Equals(resolved, expectedCategory, StringComparison.OrdinalIgnoreCase);
+        using var db = new SqlConnection(_connectionString);
+
+        var expectedCategoryId = await db.QuerySingleOrDefaultAsync<int?>(
+            "SELECT CategoryId FROM CategoryKeywordMap WHERE Keyword = @Keyword",
+            new { Keyword = searchTerm.ToLowerInvariant() });
+
+        if (!expectedCategoryId.HasValue) return false;
+
+        var resolvedId = await ResolveAsync(searchTerm, rawSourceCategory);
+        return resolvedId.HasValue && resolvedId != expectedCategoryId;
     }
 }

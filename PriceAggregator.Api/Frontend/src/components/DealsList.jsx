@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { fetchDeals } from "../api";
 import DealCard from "./DealCard";
 import ProductDetailModal from "./ProductDetailModal";
+import CategoryGrid from "./CategoryGrid";
 
 const SECTION_LABELS = {
   weight_or_volume: "Ağırlık / Hacme Göre En İyi Fiyat",
@@ -29,7 +30,7 @@ function applySortAndFilter(list, { selectedBrands, sortBy }) {
   result = [...result].sort((a, b) => {
     if (sortBy === "price") return a.price - b.price;
     if (sortBy === "priceDesc") return b.price - a.price;
-    return a.pricePerUnit - b.pricePerUnit; // default: unitPrice
+    return a.pricePerUnit - b.pricePerUnit;
   });
 
   return result;
@@ -37,24 +38,22 @@ function applySortAndFilter(list, { selectedBrands, sortBy }) {
 
 export default function DealsList() {
   const [query, setQuery] = useState("");
+  const [activeLabel, setActiveLabel] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedMasterId, setSelectedMasterId] = useState(null);
-
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [sortBy, setSortBy] = useState("unitPrice");
 
-  async function handleSearch(e) {
-    e.preventDefault();
-    if (!query.trim()) return;
-
+  async function runSearch({ q, categoryId }) {
     setLoading(true);
     setError(null);
-    setSelectedBrands(new Set()); // reset filters on a new search
+    setSelectedBrands(new Set());
+    setActiveLabel(categoryId ?? q);
 
     try {
-      const result = await fetchDeals(query.trim());
+      const result = await fetchDeals({ q, categoryId });
       setData(result);
     } catch (err) {
       setError("Arama başarısız oldu.");
@@ -64,7 +63,17 @@ export default function DealsList() {
     }
   }
 
-  // All brands present in the PRIMARY section, for the filter checkboxes
+  function handleSearch(e) {
+    e.preventDefault();
+    if (!query.trim()) return;
+    runSearch({ q: query.trim() });
+  }
+
+  function handleCategoryClick(categoryId) {
+    setQuery("");
+    runSearch({ categoryId });
+  }
+
   const availableBrands = useMemo(() => {
     if (!data?.results) return [];
     const brands = new Set(data.results.map((d) => d.brand).filter(Boolean));
@@ -94,7 +103,7 @@ export default function DealsList() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <form onSubmit={handleSearch} className="flex gap-2 mb-8">
+      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
         <input
           type="text"
           value={query}
@@ -112,6 +121,8 @@ export default function DealsList() {
         </button>
       </form>
 
+      {!data && !loading && <CategoryGrid onSelectCategory={handleCategoryClick} />}
+
       {loading && <p className="text-slate-500">Yükleniyor...</p>}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !error && data && !hasResults && (
@@ -120,7 +131,6 @@ export default function DealsList() {
 
       {!loading && !error && data && hasResults && (
         <div className="flex gap-8">
-          {/* Sidebar: brand filter */}
           {availableBrands.length > 0 && (
             <aside className="w-48 shrink-0">
               <h3 className="text-sm font-bold text-slate-900 mb-3">Marka</h3>
@@ -151,7 +161,6 @@ export default function DealsList() {
             </aside>
           )}
 
-          {/* Results */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-900">

@@ -120,10 +120,19 @@ app.MapGet("/api/products", async (
     return Results.Ok(masterProducts);
 });
 
-app.MapGet("/api/deals", async (string q) =>
+app.MapGet("/api/deals", async (string? q, int? categoryId) =>
 {
+    var categoryMapper = new CategoryMapper(connectionString);
+
+    var resolvedCategoryId = categoryId
+        ?? await categoryMapper.ResolveAsync(q ?? "", null);
+
+    if (!resolvedCategoryId.HasValue)
+    {
+        return Results.Ok(new { primaryUnit = "weight_or_volume", results = Array.Empty<object>(), otherUnitResults = Array.Empty<object>() });
+    }
+
     using var db = new SqlConnection(connectionString);
-    var category = CategoryMapper.Resolve(q, null);
 
     var rows = await db.QueryAsync<DealRow>(@"
         SELECT mp.Id AS MasterProductId, mp.CanonicalTitle, mp.Brand,
@@ -131,8 +140,8 @@ app.MapGet("/api/deals", async (string q) =>
                p.Source, p.Price, p.ImageUrl, p.ProductUrl
         FROM MasterProducts mp
         JOIN Products p ON p.MasterProductId = mp.Id
-        WHERE mp.CanonicalCategory = @Category",
-        new { Category = category });
+        WHERE mp.CanonicalCategoryId = @CategoryId",
+        new { CategoryId = resolvedCategoryId });
 
     var withUnitPrice = rows.Select(r => new
     {
@@ -176,6 +185,22 @@ app.MapGet("/api/deals", async (string q) =>
     });
 });
 
+app.MapGet("/api/categories", async () =>
+{
+    using var db = new SqlConnection(connectionString);
+    var rows = await db.QueryAsync<CategoryDto>(@"
+        SELECT c.Id, c.Name, c.Slug, c.Icon,
+               COUNT(mp.Id) AS ProductCount
+        FROM Categories c
+        LEFT JOIN MasterProducts mp ON mp.CanonicalCategoryId = c.Id
+        WHERE c.ParentCategoryId IS NULL
+        GROUP BY c.Id, c.Name, c.Slug, c.Icon, c.DisplayOrder
+        HAVING COUNT(mp.Id) > 0
+        ORDER BY c.DisplayOrder");
+
+    return Results.Ok(rows);
+});
+
 app.Run();
 
 public record DealRow(
@@ -189,3 +214,5 @@ public record DealRow(
     decimal Price,
     string? ImageUrl,
     string? ProductUrl);
+
+public record CategoryDto(int Id, string Name, string Slug, string? Icon, int ProductCount);

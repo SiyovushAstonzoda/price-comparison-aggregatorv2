@@ -114,7 +114,8 @@ public class Worker : BackgroundService
                 var savedId = await repo.SaveAsync(scraperName, product);
                 if (savedId is null) { failed++; continue; }
 
-                var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title, searchItem, product.SourceCategory);
+                var matched = await matchingService.MatchProductAsync(
+                    savedId.Value, product.Brand, product.Title, searchItem, product.SourceCategory);
                 if (matched) saved++; else failed++;
             }
         }

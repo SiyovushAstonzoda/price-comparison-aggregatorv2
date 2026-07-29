@@ -16,13 +16,19 @@ function getApiBase() {
 
 export const API_BASE = getApiBase();
 
-/**
- * Fetch ranked deals (by unit price) for a search query.
- * Returns camelCase objects (typed DealRow record from C#).
- */
-export async function fetchDeals(query) {
-  const res = await fetch(`${API_BASE}/deals?q=${encodeURIComponent(query)}`);
+export async function fetchDeals({ q, categoryId }) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (categoryId) params.set("categoryId", categoryId);
+
+  const res = await fetch(`${API_BASE}/deals?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch deals");
+  return res.json();
+}
+
+export async function fetchCategories() {
+  const res = await fetch(`${API_BASE}/categories`);
+  if (!res.ok) throw new Error("Failed to fetch categories");
   return res.json();
 }
 
