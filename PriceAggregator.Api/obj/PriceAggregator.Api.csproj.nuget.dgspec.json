@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj": {}
+    "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Api/PriceAggregator.Api.csproj": {}
   },
   "projects": {
-    "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj": {
+    "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Api/PriceAggregator.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj",
+        "projectUniqueName": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Api/PriceAggregator.Api.csproj",
         "projectName": "PriceAggregator.Api",
-        "projectPath": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/PriceAggregator.Api.csproj",
+        "projectPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Api/PriceAggregator.Api.csproj",
         "packagesPath": "/Users/sariadarkazanli/.nuget/packages/",
-        "outputPath": "/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/",
+        "outputPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/sariadarkazanli/.nuget/NuGet/NuGet.Config"

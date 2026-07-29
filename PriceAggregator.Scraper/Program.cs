@@ -1,6 +1,6 @@
-﻿using PriceAggregator.Scraper;
+using PriceAggregator.Core;
 
-var connectionString = "Server=localhost,1433;Database=Tutumlu;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;";
+var connectionString = "Server=localhost,1433;Database=Tutumlu;User Id=sa;Password=SariaAdmin123!;TrustServerCertificate=True;";
 
 var httpClient1 = new HttpClient();
 var migrosScraper = new MigrosScraper(httpClient1);
@@ -9,35 +9,48 @@ var httpClient2 = new HttpClient();
 var macroCenterScraper = new MacroCenterScraper(httpClient2);
 
 var httpClient3 = new HttpClient();
-var marketFiyatiScraper = new MarketFiyatiScraper(httpClient3);
+var ikeaScraper = new IkeaScraper(httpClient3);
 
 var repo = new ProductRepository(connectionString);
 var matchingService = new MatchingService(connectionString);
 
-string searchItem = "su";
+var marketSearchTerms = new[] { "su", "nutella", "çay", "kahve", "makarna" };
+var ikeaSearchTerms = new[] { "sandalye", "masa", "koltuk", "dolap", "lamba", "yatak", "sehpa", "mutfak" };
 
-var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
-foreach (var product in migrosProducts)
+int savedCount = 0;
+int failedCount = 0;
+
+foreach (var searchItem in marketSearchTerms)
 {
-    var savedId = await repo.SaveAsync("migros", product);
-    await matchingService.MatchProductAsync(savedId, product.Brand, product.Title);
+    var migrosProducts = await migrosScraper.FetchProductsAsync(searchItem);
+    foreach (var product in migrosProducts)
+    {
+        var savedId = await repo.SaveAsync("migros", product);
+        if (savedId is null) { failedCount++; continue; }
+        var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+        if (matched) savedCount++; else failedCount++;
+    }
+
+    var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
+    foreach (var product in macroProducts)
+    {
+        var savedId = await repo.SaveAsync("macrocenter", product);
+        if (savedId is null) { failedCount++; continue; }
+        var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+        if (matched) savedCount++; else failedCount++;
+    }
 }
 
-var macroProducts = await macroCenterScraper.FetchProductsAsync(searchItem);
-foreach (var product in macroProducts)
+foreach (var searchItem in ikeaSearchTerms)
 {
-    var savedId = await repo.SaveAsync("macrocenter", product);
-    await matchingService.MatchProductAsync(savedId, product.Brand, product.Title);
+    var ikeaProducts = await ikeaScraper.FetchProductsAsync(searchItem);
+    foreach (var product in ikeaProducts)
+    {
+        var savedId = await repo.SaveAsync("ikea", product);
+        if (savedId is null) { failedCount++; continue; }
+        var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+        if (matched) savedCount++; else failedCount++;
+    }
 }
 
-var marketProducts = await marketFiyatiScraper.FetchProductsAsync(searchItem);
-foreach (var product in marketProducts)
-{
-    var savedId = await repo.SaveAsync("marketfiyati", product);
-    await matchingService.MatchProductAsync(savedId, product.Brand, product.Title);
-}
-
-Console.WriteLine(
-    $"Saved {migrosProducts.Count} Migros + " +
-    $"{macroProducts.Count} Macrocenter + " +
-    $"{marketProducts.Count} MarketFiyati products.");
+Logger.Log($"Done scraping. Saved+matched successfully: {savedCount}, Failed: {failedCount}");

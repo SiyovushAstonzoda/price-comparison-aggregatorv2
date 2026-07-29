@@ -12,4 +12,8 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
   </ItemGroup>
 
+  <Target Name="BuildFrontend" BeforeTargets="Build" Condition="Exists('Client/package.json')">
+    <Exec WorkingDirectory="Client" Command="npm run build" />
+  </Target>
+
 </Project>
