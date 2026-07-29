@@ -1,0 +1,272 @@
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/appsettings.Development.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/appsettings.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.staticwebassets.endpoints.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.deps.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.runtimeconfig.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.pdb
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Dapper.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.AspNetCore.OpenApi.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Bcl.Cryptography.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.Internal.Logging.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.OpenApi.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.SqlServer.Server.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/System.Configuration.ConfigurationManager.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/System.Security.Cryptography.ProtectedData.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/cs/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/de/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/es/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/fr/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/it/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/ja/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/ko/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/pl/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/pt-BR/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/ru/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/tr/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/zh-Hans/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/zh-Hant/Microsoft.Data.SqlClient.resources.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/runtimes/unix/lib/net9.0/Microsoft.Data.SqlClient.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win/lib/net9.0/Microsoft.Data.SqlClient.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.csproj.AssemblyReference.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/rpswa.dswa.cache.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.GeneratedMSBuildEditorConfig.editorconfig
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.AssemblyInfoInputs.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.AssemblyInfo.cs
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.csproj.CoreCompileInputs.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cs
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/rjimswa.dswa.cache.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/scopedcss/bundle/PriceAggregator.Api.styles.css
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.json.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.development.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.endpoints.json
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/swae.build.ex.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAgg.90F204B3.Up2Date
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/refint/PriceAggregator.Api.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.pdb
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.genruntimeconfig.cache
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/ref/PriceAggregator.Api.dll
+/Users/siyovushastonzoda/Desktop/PriceAggregator/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.sourcelink.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/appsettings.Development.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/appsettings.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.staticwebassets.endpoints.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.deps.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.runtimeconfig.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/PriceAggregator.Api.pdb
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Dapper.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.AspNetCore.OpenApi.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Bcl.Cryptography.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.Data.SqlClient.Internal.Logging.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Logging.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.IdentityModel.Tokens.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.OpenApi.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Microsoft.SqlServer.Server.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/System.Configuration.ConfigurationManager.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/System.Security.Cryptography.ProtectedData.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/cs/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/de/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/es/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/fr/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/it/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/ja/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/ko/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/pl/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/pt-BR/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/ru/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/tr/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/zh-Hans/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/zh-Hant/Microsoft.Data.SqlClient.resources.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/runtimes/unix/lib/net9.0/Microsoft.Data.SqlClient.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win/lib/net9.0/Microsoft.Data.SqlClient.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.csproj.AssemblyReference.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/rpswa.dswa.cache.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.AssemblyInfoInputs.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.AssemblyInfo.cs
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.csproj.CoreCompileInputs.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cs
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.sourcelink.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/rjimswa.dswa.cache.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/scopedcss/bundle/PriceAggregator.Api.styles.css
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.json.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.development.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/staticwebassets.build.endpoints.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/swae.build.ex.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAgg.90F204B3.Up2Date
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/refint/PriceAggregator.Api.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.pdb
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/PriceAggregator.Api.genruntimeconfig.cache
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/obj/Debug/net10.0/ref/PriceAggregator.Api.dll
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Frontend/package-lock.json
+/Users/sariadarkazanli/Desktop/cpm/price-comparison-aggregatorv2/PriceAggregator.Api/bin/Debug/net10.0/Frontend/package.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\appsettings.Development.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\appsettings.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Frontend\package-lock.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Frontend\package.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.staticwebassets.endpoints.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.exe
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.deps.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.runtimeconfig.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.pdb
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Dapper.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.Internal.Logging.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.csproj.AssemblyReference.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.AssemblyInfoInputs.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.AssemblyInfo.cs
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.csproj.CoreCompileInputs.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjimswa.dswa.cache.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\scopedcss\bundle\PriceAggregator.Api.styles.css
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.json.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.development.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.endpoints.json
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\swae.build.ex.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAgg.90F204B3.Up2Date
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\refint\PriceAggregator.Api.dll
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.pdb
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.genruntimeconfig.cache
+C:\Users\semak\Desktop\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\ref\PriceAggregator.Api.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\appsettings.Development.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\appsettings.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Frontend\package-lock.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Frontend\package.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.staticwebassets.endpoints.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.exe
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.deps.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.runtimeconfig.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\PriceAggregator.Api.pdb
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Dapper.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.Extensions.Abstractions.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.Data.SqlClient.Internal.Logging.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\Microsoft.SqlServer.Server.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.Configuration.ConfigurationManager.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\cs\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\de\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\es\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\fr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\it\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ja\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ko\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\pl\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\pt-BR\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\ru\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\tr\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\zh-Hans\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\zh-Hant\Microsoft.Data.SqlClient.resources.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\unix\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win\lib\net9.0\Microsoft.Data.SqlClient.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.csproj.AssemblyReference.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.AssemblyInfoInputs.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.AssemblyInfo.cs
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.csproj.CoreCompileInputs.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjimswa.dswa.cache.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\scopedcss\bundle\PriceAggregator.Api.styles.css
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.json.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.development.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\staticwebassets.build.endpoints.json
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\swae.build.ex.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAgg.90F204B3.Up2Date
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\refint\PriceAggregator.Api.dll
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.pdb
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\PriceAggregator.Api.genruntimeconfig.cache
+C:\Users\ALYA\Downloads\price-comparison-aggregatorv2-saria-version (1)\price-comparison-aggregatorv2-saria-version\PriceAggregator.Api\obj\Debug\net10.0\ref\PriceAggregator.Api.dll

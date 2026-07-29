@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PriceAggregator.Api/PriceAggregator.Api.csproj" />
+  <Project Path="PriceAggregator.Scraper/PriceAggregator.Scraper.csproj" />
+</Solution>
