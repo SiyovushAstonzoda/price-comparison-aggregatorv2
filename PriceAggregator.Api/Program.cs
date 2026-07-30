@@ -1,65 +1,68 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.FileProviders;
-using PriceAggregator.Core;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
-
+builder.Services.AddCors(o => o.AddPolicy("AllowFrontend", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 var app = builder.Build();
-
 app.UseCors("AllowFrontend");
-
 var frontendPath = Path.Combine(builder.Environment.ContentRootPath, "Frontend");
 var distPath = Path.Combine(frontendPath, "dist");
-if (Directory.Exists(distPath))
-{
-    frontendPath = distPath;
-}
+if (Directory.Exists(distPath)) frontendPath = distPath;
+app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = new PhysicalFileProvider(frontendPath) });
+app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(frontendPath) });
+string connectionString = "Server=localhost\\SQLEXPRESS;Database=Aggregator;User Id=sa;Password=123456;TrustServerCertificate=True;";
 
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    FileProvider = new PhysicalFileProvider(frontendPath)
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(frontendPath)
-});
-
-string connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
-
-app.MapGet("/api/brands", async () =>
+// Marka filtresinde kullanilmak uzere tum marka adlarini listeler.
+app.MapGet("/api/brands", async (int? categoryId) =>
 {
     using var db = new SqlConnection(connectionString);
-    var brands = await db.QueryAsync<string>(@"
-        SELECT DISTINCT mp.Brand
-        FROM MasterProducts mp
-        JOIN Products p ON p.MasterProductId = mp.Id
-        WHERE mp.Brand IS NOT NULL AND mp.Brand <> ''
-        ORDER BY mp.Brand");
+    const string allBrandsSql = "SELECT Name FROM Brands ORDER BY Name";
+    const string categoryBrandsSql = @"WITH CategoryTree AS (
+        SELECT Id FROM Categories WHERE Id = @CategoryId
+        UNION ALL
+        SELECT child.Id FROM Categories child JOIN CategoryTree tree ON child.ParentCategoryId = tree.Id
+    )
+    SELECT DISTINCT b.Name FROM Brands b
+    JOIN Products p ON p.BrandId = b.Id
+    JOIN CategoryTree tree ON tree.Id = p.CategoryId
+    ORDER BY b.Name OPTION (MAXRECURSION 100)";
+
+    var brands = await db.QueryAsync<string>(
+        categoryId.HasValue ? categoryBrandsSql : allBrandsSql,
+        new { CategoryId = categoryId });
     return Results.Ok(brands);
 });
-
-app.MapGet("/api/products/{masterId}", async (int masterId) =>
+// Secilen urunun aktif magaza tekliflerini, fiyatlarini ve urun baglantilarini listeler.
+app.MapGet("/api/products/{productId}", async (int productId) => { using var db=new SqlConnection(connectionString); return Results.Ok(await db.QueryAsync(@"SELECT p.Name AS CanonicalTitle, s.Name AS Source, o.Price, sp.ExternalImageUrl AS ImageUrl, sp.ExternalUrl AS ProductUrl FROM Products p JOIN Offers o ON o.ProductId=p.Id JOIN Sellers s ON s.Id=o.SellerId JOIN SellerProducts sp ON sp.Id=o.SellerProductId WHERE p.Id=@ProductId AND o.IsActive=1 ORDER BY o.Price",new{ProductId=productId})); });
+// Ana urun ekranini arama, marka, fiyat ve siralama filtreleriyle besler.
+app.MapGet("/api/products", async (string? q,string? brand,string? sort,decimal? minPrice,decimal? maxPrice) => { using var db=new SqlConnection(connectionString); var sql="SELECT p.Id,p.Name AS CanonicalTitle,b.Name AS Brand,MIN(o.Price) AS LowestPrice,COUNT(o.Id) AS OfferCount,MAX(sp.ExternalImageUrl) AS ImageUrl FROM Products p JOIN Brands b ON b.Id=p.BrandId JOIN Offers o ON o.ProductId=p.Id JOIN SellerProducts sp ON sp.Id=o.SellerProductId WHERE o.IsActive=1"; var a=new DynamicParameters(); if(!string.IsNullOrWhiteSpace(q)){sql+=" AND (p.Name LIKE @q OR b.Name LIKE @q)";a.Add("q",$"%{q.Trim()}% ".TrimEnd());} if(!string.IsNullOrWhiteSpace(brand)){sql+=" AND b.Name=@brand";a.Add("brand",brand);} sql+=" GROUP BY p.Id,p.Name,b.Name"; if(minPrice.HasValue){sql+=" HAVING MIN(o.Price)>=@min";a.Add("min",minPrice);} if(maxPrice.HasValue){sql+=minPrice.HasValue?" AND MIN(o.Price)<=@max":" HAVING MIN(o.Price)<=@max";a.Add("max",maxPrice);} sql+=" ORDER BY "+(sort=="price_desc"?"LowestPrice DESC":sort=="price_asc"?"LowestPrice ASC":sort=="name_desc"?"CanonicalTitle DESC":"CanonicalTitle ASC"); return Results.Ok(await db.QueryAsync(sql,a)); });
+// Aranan urun adina gore aktif teklifleri fiyat sirasi ile listeler.
+app.MapGet("/api/deals", async (string q) => { using var db=new SqlConnection(connectionString); var rows=await db.QueryAsync(@"SELECT p.Id AS MasterProductId,p.Name AS CanonicalTitle,b.Name AS Brand,s.Name AS Source,o.Price,sp.ExternalImageUrl AS ImageUrl,sp.ExternalUrl AS ProductUrl FROM Products p JOIN Brands b ON b.Id=p.BrandId JOIN Offers o ON o.ProductId=p.Id JOIN Sellers s ON s.Id=o.SellerId JOIN SellerProducts sp ON sp.Id=o.SellerProductId WHERE o.IsActive=1 AND p.Name LIKE @q ORDER BY o.Price",new{q=$"%{q}%"}); return Results.Ok(new{primaryUnit="price",results=rows,otherUnitResults=Array.Empty<object>()}); });
+// ParentCategoryId degerine gore kok veya alt kategori dugumlerini listeler.
+app.MapGet("/api/categories", async (int? parentId) =>
 {
     using var db = new SqlConnection(connectionString);
-    var offers = await db.QueryAsync(@"
-        SELECT mp.CanonicalTitle, p.Source, p.Price, p.ImageUrl, p.ProductUrl
-        FROM MasterProducts mp
-        JOIN Products p ON p.MasterProductId = mp.Id
-        WHERE mp.Id = @MasterId
-        ORDER BY p.Price ASC",
-        new { MasterId = masterId });
-
-    return Results.Ok(offers);
+    var categories = await db.QueryAsync(@"WITH CategoryTree AS (
+        SELECT Id AS RootCategoryId, Id AS DescendantCategoryId FROM Categories
+        UNION ALL
+        SELECT tree.RootCategoryId, child.Id
+        FROM CategoryTree tree
+        JOIN Categories child ON child.ParentCategoryId = tree.DescendantCategoryId
+    )
+    SELECT c.Id, c.Name, c.ParentCategoryId,
+        CAST(CASE WHEN EXISTS (SELECT 1 FROM Categories child WHERE child.ParentCategoryId = c.Id) THEN 1 ELSE 0 END AS bit) AS HasChildren,
+        COUNT(DISTINCT p.Id) AS ProductCount
+    FROM Categories c
+    LEFT JOIN CategoryTree tree ON tree.RootCategoryId = c.Id
+    LEFT JOIN Products p ON p.CategoryId = tree.DescendantCategoryId
+    WHERE c.IsActive = 1
+      AND ((@ParentId IS NULL AND c.ParentCategoryId IS NULL) OR c.ParentCategoryId = @ParentId)
+    GROUP BY c.Id, c.Name, c.ParentCategoryId
+    ORDER BY c.Name OPTION (MAXRECURSION 100)", new { ParentId = parentId });
+    return Results.Ok(categories);
 });
+<<<<<<< Updated upstream
 
 app.MapGet("/api/products", async (
     string? q,
@@ -121,6 +124,10 @@ app.MapGet("/api/products", async (
 });
 
 app.MapGet("/api/deals", async (string? q, int? categoryId) =>
+=======
+// Secilen yaprak kategoriye bagli urunleri teklif, marka ve gorsel bilgileriyle listeler.
+app.MapGet("/api/categories/{categoryId:int}/products", async (int categoryId) =>
+>>>>>>> Stashed changes
 {
     var categoryMapper = new CategoryMapper(connectionString);
 
@@ -133,6 +140,7 @@ app.MapGet("/api/deals", async (string? q, int? categoryId) =>
     }
 
     using var db = new SqlConnection(connectionString);
+<<<<<<< Updated upstream
 
     var rows = await db.QueryAsync<DealRow>(@"
         SELECT mp.Id AS MasterProductId, mp.CanonicalTitle, mp.Brand,
@@ -216,3 +224,18 @@ public record DealRow(
     string? ProductUrl);
 
 public record CategoryDto(int Id, string Name, string Slug, string? Icon, int ProductCount);
+=======
+    var products = await db.QueryAsync(@"WITH CategoryTree AS (
+        SELECT Id FROM Categories WHERE Id = @CategoryId
+        UNION ALL SELECT c.Id FROM Categories c JOIN CategoryTree tree ON c.ParentCategoryId = tree.Id
+    )
+    SELECT p.Id, p.Name AS CanonicalTitle, b.Name AS Brand, MIN(o.Price) AS LowestPrice,
+           COUNT(DISTINCT o.SellerId) AS OfferCount, MAX(sp.ExternalImageUrl) AS ImageUrl
+    FROM Products p JOIN Brands b ON b.Id=p.BrandId JOIN Offers o ON o.ProductId=p.Id AND o.IsActive=1
+    JOIN Sellers s ON s.Id=o.SellerId JOIN SellerProducts sp ON sp.Id=o.SellerProductId
+    WHERE p.CategoryId = @CategoryId
+    GROUP BY p.Id,p.Name,b.Name ORDER BY LowestPrice",new{CategoryId=categoryId});
+    return Results.Ok(products);
+});
+app.Run();
+>>>>>>> Stashed changes

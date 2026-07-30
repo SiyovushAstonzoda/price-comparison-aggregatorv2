@@ -23,7 +23,7 @@ public class Worker : BackgroundService
             }
             catch (TaskCanceledException)
             {
-                // Happens on graceful shutdown — expected, not an error
+                // Düzenli kapatma sırasında beklenen durumdur, hata değildir.
                 break;
             }
         }
@@ -47,6 +47,9 @@ public class Worker : BackgroundService
 
         var httpClient6 = new HttpClient();
         var hakmarExpressScraper = new HakmarExpressScraper(httpClient6);
+
+        var httpClient9 = new HttpClient();
+        var ozdilekScraper = new OzdilekteyimScraper(httpClient9);
 
         // var httpClient8 = new HttpClient();
         // var cagriMarketScraper = new CagriMarketScraper(httpClient8);
@@ -89,13 +92,16 @@ public class Worker : BackgroundService
             var hakmarRes = await RunScraperSafe("hakmarexpress", () => hakmarExpressScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
             savedCount += hakmarRes.saved; failedCount += hakmarRes.failed;
 
+            var ozdilekRes = await RunScraperSafe("ozdilek", () => ozdilekScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += ozdilekRes.saved; failedCount += ozdilekRes.failed;
+
             // var ikeaRes = await RunScraperSafe("ikea", () => ikeaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
             // savedCount += ikeaRes.saved; failedCount += ikeaRes.failed;
 
             // var cagriRes = await RunScraperSafe("cagrimarket", () => cagriMarketScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
             // savedCount += cagriRes.saved; failedCount += cagriRes.failed;
 
-            // Small delay between search terms to avoid hammering the sites back-to-back
+            // Siteleri art arda yoğun istekle yormamak için arama kelimeleri arasında bekleme yapılabilir.
             //await Task.Delay(TimeSpan.FromSeconds(3));
         }
 

@@ -23,6 +23,7 @@ public class EvideaScraper
         _httpClient.DefaultRequestHeaders.Add("Origin", "https://www.evidea.com");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var url = "https://api.tr.primewidgets.com/products/searchv5/evidea?=";

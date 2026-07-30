@@ -18,6 +18,7 @@ public class MigrosScraper
         _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.migros.com.tr/");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var results = new List<ProductDto>();
@@ -63,6 +64,7 @@ public class MigrosScraper
         return results;
     }
 
+    // Veriyi ayrisirir.
     private ProductDto ParseProduct(JsonElement p)
     {
         string? imageUrl = null;

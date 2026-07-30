@@ -4,21 +4,25 @@ using Microsoft.Data.SqlClient;
 
 namespace PriceAggregator.Core;
 
+// Magazadan gelen urunu ana katalog urunuyle eslestirir ve teklif kayitlarini gunceller.
 public class MatchingService
 {
     private readonly string _connectionString;
     private readonly CategoryMapper _categoryMapper;
 
+    // Veritabani baglantisini servis boyunca kullanmak uzere saklar.
     public MatchingService(string connectionString)
     {
         _connectionString = connectionString;
         _categoryMapper = new CategoryMapper(connectionString);
     }
 
-    public async Task<bool> MatchProductAsync(int productId, string? brand, string title, string searchTerm, string? sourceCategory)
+    // SellerProducts kaydini Products, Offers, OffersPriceHistory ve ProductMatchingLogs tablolarina baglar.
+    public async Task<bool> MatchProductAsync(int sellerProductId, string? brand, string title, string searchTerm, string? sourceCategory)
     {
         try
         {
+<<<<<<< Updated upstream
             if (await _categoryMapper.IsLikelyFalsePositiveAsync(searchTerm, sourceCategory))
             {
                 Logger.Log($"[Matching] Skipping likely false positive: '{title}' (category: {sourceCategory}) for search '{searchTerm}'");
@@ -77,20 +81,38 @@ public class MatchingService
                 "UPDATE Products SET MasterProductId = @MasterId WHERE Id = @ProductId",
                 new { MasterId = masterId, ProductId = productId });
 
+=======
+            // Arama kelimesiyle celisen kategoriye sahip urunleri eslestirmeden atlar.
+            if (CategoryMapper.IsLikelyFalsePositive(searchTerm, sourceCategory)) return false;
+            using var db = new SqlConnection(_connectionString);
+            // Marka yoksa zorunlu BrandId iliskisi icin Unknown markasi kullanilir.
+            var brandName = string.IsNullOrWhiteSpace(brand) ? "Unknown" : brand.Trim();
+            var brandId = await db.QuerySingleOrDefaultAsync<int?>("SELECT TOP 1 Id FROM Brands WHERE Name=@Name", new { Name = brandName })
+                ?? await db.QuerySingleAsync<int>("INSERT INTO Brands (Name) OUTPUT INSERTED.Id VALUES (@Name)", new { Name = brandName });
+            // Kategori yoksa zorunlu CategoryId iliskisi icin Diger kategorisi kullanilir.
+            var categoryName = string.IsNullOrWhiteSpace(sourceCategory) ? "Diğer" : sourceCategory.Trim();
+            var categoryId = await db.QuerySingleOrDefaultAsync<int?>("SELECT TOP 1 Id FROM Categories WHERE Name=@Name", new { Name = categoryName })
+                ?? await db.QuerySingleAsync<int>("INSERT INTO Categories (Name, Slug) OUTPUT INSERTED.Id VALUES (@Name, @Slug)", new { Name = categoryName, Slug = TurkishNormalizer.Normalize(categoryName).Replace(' ', '-') });
+            // Ayni marka ve kategorideki katalog urunleri aday eslesme olarak okunur.
+            var candidates = await db.QueryAsync<(int Id, string Name)>("SELECT Id, Name FROM Products WHERE BrandId=@BrandId AND CategoryId=@CategoryId", new { BrandId = brandId, CategoryId = categoryId });
+            // Urun adlari token benzerligi ile puanlanir; 0.70 ve uzeri ayni urun kabul edilir.
+            var match = candidates.Select(x => (x.Id, Score: CalculateSimilarity(x.Name, title, brandName))).OrderByDescending(x => x.Score).FirstOrDefault();
+            var productId = match.Id != 0 && match.Score >= .70 ? match.Id : await db.QuerySingleAsync<int>("INSERT INTO Products (BrandId, CategoryId, Name) OUTPUT INSERTED.Id VALUES (@BrandId,@CategoryId,@Name)", new { BrandId = brandId, CategoryId = categoryId, Name = title });
+            // Magaza urunu icin daha once olusturulmus teklif kaydi aranir.
+            var offer = await db.QuerySingleOrDefaultAsync<(int Id, decimal Price)>("SELECT TOP 1 Id, Price FROM Offers WHERE SellerProductId=@Id AND ProductId=@ProductId", new { Id=sellerProductId, ProductId=productId });
+            var price = await db.QuerySingleAsync<decimal>("SELECT CurrentPrice FROM SellerProducts WHERE Id=@Id", new { Id=sellerProductId });
+            var sellerId = await db.QuerySingleAsync<int>("SELECT SellerId FROM SellerProducts WHERE Id=@Id", new { Id=sellerProductId });
+            // Teklif yoksa eklenir; fiyat degismisse aktif teklif ve fiyat gecmisi guncellenir.
+            var offerId = offer.Id == 0 ? await db.QuerySingleAsync<int>("INSERT INTO Offers (ProductId,SellerId,SellerProductId,Price) OUTPUT INSERTED.Id VALUES (@ProductId,@SellerId,@SellerProductId,@Price)", new { ProductId=productId,SellerId=sellerId,SellerProductId=sellerProductId,Price=price }) : offer.Id;
+            if (offer.Id == 0 || offer.Price != price) { if(offer.Id != 0) await db.ExecuteAsync("UPDATE Offers SET Price=@Price,LastUpdatedAt=GETDATE() WHERE Id=@Id",new{Id=offerId,Price=price}); await db.ExecuteAsync("INSERT INTO OffersPriceHistory (OfferId,Price) VALUES (@OfferId,@Price)",new{OfferId=offerId,Price=price}); }
+            // Otomatik eslestirmenin sonucu ve benzerlik puani denetim icin kaydedilir.
+            await db.ExecuteAsync("INSERT INTO ProductMatchingLogs (SellerProductId,ProductId,Status,MatchedBy,Notes) VALUES (@SellerProductId,@ProductId,'Matched','AutomaticSimilarity',@Notes)",new{SellerProductId=sellerProductId,ProductId=productId,Notes=$"Score: {match.Score:F2}"});
+>>>>>>> Stashed changes
             return true;
         }
-        catch (SqlException ex)
-        {
-            Logger.Log($"[Matching] DB error matching product {productId} ('{title}'): {ex.Message}");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Logger.Log($"[Matching] Unexpected error matching product {productId} ('{title}'): {ex.Message}");
-            return false;
-        }
+        // Veritabani hatasi scraper akisini durdurmaz; hata loglanir.
+        catch (SqlException ex) { Logger.Log($"[Matching] DB error: {ex.Message}"); return false; }
     }
-
     private static readonly HashSet<string> UnitWords = new(StringComparer.OrdinalIgnoreCase)
     {
         "ml", "lt", "l", "g", "gr", "kg", "adet", "cc", "pet"
@@ -116,6 +138,7 @@ public class MatchingService
         return text;
     }
 
+    // Urun adini marka, birim ve gereksiz kelimelerden arindirarak eslestirme tokenlarina ayirir.
     private HashSet<string> Tokenize(string text, string? brand)
     {
         if (string.IsNullOrWhiteSpace(text)) return new HashSet<string>();
@@ -138,20 +161,20 @@ public class MatchingService
             .ToHashSet();
     }
 
-    // Two tokens are "the same word" if identical, or if one is the other's root
-    // plus a short Turkish suffix (handles çay/çayı, tiryaki/tiryakiler, etc.)
+    // İki kelimenin aynı ya da kök-ek ilişkisiyle benzer olup olmadığını kontrol eder.
+    // Kısa Türkçe ek farklılıklarını da eşleşme olarak kabul eder.
     private static bool TokensMatch(string a, string b)
     {
         if (a == b) return true;
 
-        // Turkish-suffix case: one word is a prefix of the other (çay / çayı)
+        // Bir kelime diğerinin kısa ek almış hâliyse eşleşme kabul edilir.
         var shorter = a.Length <= b.Length ? a : b;
         var longer = a.Length <= b.Length ? b : a;
         if (longer.StartsWith(shorter, StringComparison.Ordinal) && (longer.Length - shorter.Length) <= 3)
             return true;
 
-        // Spelling-variant case: small edit distance relative to word length
-        // (handles transliteration differences like "Spaghetti" vs "Spagetti")
+        // Yazım farkı küçükse kelimeler benzer kabul edilir.
+        // Ornek: Spaghetti ve Spagetti gibi kucuk yazim farklarini da yakalar.
         if (shorter.Length >= 5)
         {
             int maxAllowedDistance = shorter.Length <= 7 ? 1 : 2;
@@ -162,6 +185,7 @@ public class MatchingService
         return false;
     }
 
+    // Iki kelime arasindaki en az karakter degisimi sayisini hesaplar.
     private static int LevenshteinDistance(string a, string b)
     {
         var dp = new int[a.Length + 1, b.Length + 1];
@@ -183,19 +207,21 @@ public class MatchingService
         return dp[a.Length, b.Length];
     }
 
+    // Iki urun adinin ortak tokenlarina gore 0 ile 1 arasynda benzerlik puani hesaplar.
     private double CalculateSimilarity(string title1, string title2, string brand)
     {
         var tokens1 = Tokenize(title1, brand);
         var tokens2 = Tokenize(title2, brand);
 
         if (tokens1.Count == 0 && tokens2.Count == 0) return 1.0;
-        if (tokens1.Count == 0 || tokens2.Count == 0) return 1.0; // your existing empty-set rule (Erikli/pet-şişe case)
+        if (tokens1.Count == 0 || tokens2.Count == 0) return 1.0; // Her iki baslikta anlamli token kalmazsa eslesme kabul edilir.
 
         var remaining = new HashSet<string>(tokens2);
         int matches = 0;
 
         foreach (var t1 in tokens1)
         {
+            // Urun adlari token benzerligi ile puanlanir; 0.70 ve uzeri ayni urun kabul edilir.
             var match = remaining.FirstOrDefault(t2 => TokensMatch(t1, t2));
             if (match != null)
             {
@@ -233,6 +259,7 @@ public class MatchingService
 
         foreach (var t1 in tokens1)
         {
+            // Urun adlari token benzerligi ile puanlanir; 0.70 ve uzeri ayni urun kabul edilir.
             var match = remaining.FirstOrDefault(t2 => TokensMatch(t1, t2));
             if (match != null)
             {

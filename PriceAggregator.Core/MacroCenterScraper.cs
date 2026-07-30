@@ -18,6 +18,7 @@ public class MacroCenterScraper
         _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.macrocenter.com.tr/");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var results = new List<ProductDto>();
@@ -63,6 +64,7 @@ public class MacroCenterScraper
         return results;
     }
 
+    // Veriyi ayrisirir.
     private ProductDto ParseProduct(JsonElement p)
     {
         string? imageUrl = null;

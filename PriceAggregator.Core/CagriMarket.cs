@@ -22,11 +22,13 @@ public class CagriMarketScraper
         _httpClient.DefaultRequestHeaders.Add("Origin", "https://www.cagri.com");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         return await FetchProductsAsync(10);
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(long categoryId = 10)
     {
         var url = $"https://api.cagri.com/category/breadcrumb/{categoryId}";

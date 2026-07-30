@@ -20,6 +20,7 @@ public class MionScraper
         _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.mion.com.tr/");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var encodedSearch = Uri.EscapeDataString(searchTerm);

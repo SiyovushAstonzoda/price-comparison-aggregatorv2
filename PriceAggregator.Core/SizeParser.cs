@@ -4,8 +4,8 @@ namespace PriceAggregator.Core;
 
 public static class SizeParser
 {
-    // Longer/more specific unit strings first isn't strictly required (word boundaries
-    // handle ambiguity), but keeping this order for readability.
+    // Daha uzun ve özel birim ifadeleri okunabilirlik için önce tutulur.
+    // Kelime sınırları belirsizliği önlese de bu sıra okunabilirliği artırır.
     private static readonly Dictionary<string, (string CanonicalUnit, decimal Multiplier)> UnitMap =
         new(StringComparer.OrdinalIgnoreCase)
         {

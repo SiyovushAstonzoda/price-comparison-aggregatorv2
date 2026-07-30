@@ -8,7 +8,7 @@ public static class Logger
     {
         var timestamped = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
 
-        // Still print to console when running manually
+        // Uygulama elle çalıştırıldığında kaydı konsola da yazar.
         Console.WriteLine(timestamped);
 
         try
@@ -21,7 +21,7 @@ public static class Logger
         }
         catch (Exception ex)
         {
-            // If logging itself fails, don't crash the app over it — just note it on console
+            // Log yazımı başarısız olursa uygulamayı durdurmaz, bilgiyi konsola yazar.
             Console.WriteLine($"[Logger] Failed to write to log file: {ex.Message}");
         }
     }

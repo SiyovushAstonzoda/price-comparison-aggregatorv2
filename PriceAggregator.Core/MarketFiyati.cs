@@ -46,6 +46,7 @@ public class MarketFiyatiScraper
         _httpClient.DefaultRequestHeaders.Add("Referer", "https://marketfiyati.org.tr/");
     }
 
+    // Veriyi getirir.
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var results = new List<ProductDto>();
