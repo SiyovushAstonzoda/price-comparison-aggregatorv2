@@ -33,7 +33,9 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(frontendPath)
 });
 
-string connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
+// Veritabanı bağlantı bilgilerini appsettings.json dosyasından değiştirin
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 app.MapGet("/api/brands", async () =>
 {

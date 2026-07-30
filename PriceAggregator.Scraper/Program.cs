@@ -1,6 +1,14 @@
-﻿using PriceAggregator.Core;
+using Microsoft.Extensions.Configuration;
+using PriceAggregator.Core;
 
-var connectionString = "Server=127.0.0.1;Database=Aggregator;User Id=sa;Password=Siyovush_2026!;TrustServerCertificate=True;";
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .Build();
+
+// Veritabanı bağlantı bilgilerini appsettings.json dosyasından değiştirin
+string connectionString = config.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 var httpClient1 = new HttpClient();
 var migrosScraper = new MigrosScraper(httpClient1);
@@ -25,7 +33,7 @@ foreach (var product in migrosProducts)
         continue;
     }
 
-    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title, searchItem, product.SourceCategory);
     if (matched) savedCount++;
     else failedCount++;
 }
@@ -40,7 +48,7 @@ foreach (var product in macroProducts)
         continue;
     }
 
-    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title);
+    var matched = await matchingService.MatchProductAsync(savedId.Value, product.Brand, product.Title, searchItem, product.SourceCategory);
     if (matched) savedCount++;
     else failedCount++;
 }
