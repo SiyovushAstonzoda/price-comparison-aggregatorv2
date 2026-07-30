@@ -8,7 +8,7 @@ export interface MarketProduct {
   sources?: string;
 }
 
-export interface IkeaProduct {
+export interface MobilyaProduct {
   id: number;
   externalId: number;
   title: string;
@@ -16,6 +16,8 @@ export interface IkeaProduct {
   price: number;
   regularPrice: number;
   productUrl: string;
+  brand?: string;
+  source?: string;
   category?: string;
   midCategory?: string;
   subCategory?: string;
@@ -24,6 +26,7 @@ export interface IkeaProduct {
   productType?: string;
   material?: string;
 }
+export type IkeaProduct = MobilyaProduct;
 
 export interface ProductOffer {
   canonicalTitle: string;
@@ -33,18 +36,22 @@ export interface ProductOffer {
   productUrl: string;
 }
 
-export interface IkeaFilters {
+export interface MobilyaFilters {
+  brands?: string[];
   categoryTree: Array<{
     category: string;
     midCategory?: string;
     subCategory?: string;
   }>;
   topCategories: string[];
+  midCategories?: string[];
+  subCategories?: string[];
   colors: string[];
   dimensions: string[];
   productTypes: string[];
   materials: string[];
 }
+export type IkeaFilters = MobilyaFilters;
 
 export interface MarketFilters {
   q: string;
@@ -55,8 +62,9 @@ export interface MarketFilters {
   maxPrice: string;
 }
 
-export interface IkeaFilterState {
+export interface MobilyaFilterState {
   q: string;
+  brand: string;
   category: string;
   midCategory: string;
   subCategory: string;
@@ -68,5 +76,6 @@ export interface IkeaFilterState {
   minPrice: string;
   maxPrice: string;
 }
+export type IkeaFilterState = MobilyaFilterState;
 
-export type Section = "market" | "ikea";
+export type Section = "market" | "mobilya";

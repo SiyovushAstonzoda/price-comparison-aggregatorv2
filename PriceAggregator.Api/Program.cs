@@ -40,7 +40,7 @@ app.MapGet("/api/sources", async () =>
     var sources = await db.QueryAsync<string>(@"
         SELECT DISTINCT Source
         FROM Products
-        WHERE Source IS NOT NULL AND Source <> '' AND Source <> 'ikea'
+        WHERE Source IS NOT NULL AND Source <> ''
         ORDER BY Source");
     return Results.Ok(sources);
 });
@@ -54,12 +54,12 @@ app.MapGet("/api/brands", async () =>
             SELECT mp.Brand
             FROM MasterProducts mp
             JOIN Products p ON p.MasterProductId = mp.Id
-            WHERE mp.Brand IS NOT NULL AND mp.Brand <> '' AND p.Source <> 'ikea'
+            WHERE mp.Brand IS NOT NULL AND mp.Brand <> '' AND p.Source NOT IN ('ikea', 'ozdilek')
             UNION
             SELECT COALESCE(NULLIF(mp.Brand, ''), p.Source) AS Brand
             FROM Products p
             LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id
-            WHERE p.Source <> 'ikea'
+            WHERE p.Source NOT IN ('ikea', 'ozdilek')
         ) b
         WHERE Brand IS NOT NULL AND Brand <> ''
         ORDER BY Brand");
@@ -76,7 +76,7 @@ app.MapGet("/api/products/{id:int}", async (int id) =>
             SELECT mp.CanonicalTitle, p.Source, p.Price, p.ImageUrl, p.ProductUrl
             FROM MasterProducts mp
             JOIN Products p ON p.MasterProductId = mp.Id
-            WHERE mp.Id = @Id AND p.Source <> 'ikea'
+            WHERE mp.Id = @Id
             ORDER BY p.Price ASC",
             new { Id = id });
         return Results.Ok(offers);
@@ -86,7 +86,7 @@ app.MapGet("/api/products/{id:int}", async (int id) =>
     var single = await db.QueryAsync(@"
         SELECT p.Title AS CanonicalTitle, p.Source, p.Price, p.ImageUrl, p.ProductUrl
         FROM Products p
-        WHERE p.Id = @ProductId AND p.Source <> 'ikea'",
+        WHERE p.Id = @ProductId",
         new { ProductId = productId });
     return Results.Ok(single);
 });
@@ -118,7 +118,7 @@ app.MapGet("/api/products", async (
                 p.Source
             FROM Products p
             LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id
-            WHERE p.Source <> 'ikea'
+            WHERE p.Source NOT IN ('ikea', 'ozdilek')
         )
         SELECT
             GroupId AS Id,
@@ -172,8 +172,30 @@ app.MapGet("/api/products", async (
     return Results.Ok(masterProducts);
 });
 
-app.MapGet("/api/ikea/products", async (
+app.MapGet("/api/mobilya/brands", async () =>
+{
+    using var db = new SqlConnection(connectionString);
+    var brands = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Brand
+        FROM (
+            SELECT mp.Brand
+            FROM MasterProducts mp
+            JOIN Products p ON p.MasterProductId = mp.Id
+            WHERE mp.Brand IS NOT NULL AND mp.Brand <> '' AND p.Source IN ('ikea', 'ozdilek')
+            UNION
+            SELECT COALESCE(NULLIF(mp.Brand, ''), CASE WHEN p.Source = 'ikea' THEN 'IKEA' WHEN p.Source = 'ozdilek' THEN 'Özdilek' ELSE p.Source END) AS Brand
+            FROM Products p
+            LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id
+            WHERE p.Source IN ('ikea', 'ozdilek')
+        ) b
+        WHERE Brand IS NOT NULL AND Brand <> ''
+        ORDER BY Brand");
+    return Results.Ok(brands);
+});
+
+app.MapGet("/api/mobilya/products", async (
     string? q,
+    string? brand,
     string? category,
     string? midCategory,
     string? subCategory,
@@ -194,79 +216,193 @@ app.MapGet("/api/ikea/products", async (
     };
 
     var sql = @"
-        SELECT Id, ExternalId, Title, ImageUrl, Price, RegularPrice, ProductUrl,
-               Category, MidCategory, SubCategory, Color, Dimensions, ProductType, Material
-        FROM Products
-        WHERE Source = 'ikea'";
+        SELECT p.Id, p.ExternalId, p.Title, p.ImageUrl, p.Price, p.RegularPrice, p.ProductUrl,
+               p.Category, p.MidCategory, p.SubCategory, p.Color, p.Dimensions, p.ProductType, p.Material,
+               COALESCE(NULLIF(mp.Brand, ''), CASE WHEN p.Source = 'ikea' THEN 'IKEA' WHEN p.Source = 'ozdilek' THEN 'Özdilek' ELSE p.Source END) AS Brand, p.Source
+        FROM Products p
+        LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id
+        WHERE p.Source IN ('ikea', 'ozdilek')";
 
     var parameters = new DynamicParameters();
 
     if (!string.IsNullOrWhiteSpace(q))
     {
-        sql += @" AND (Title LIKE @Query OR Category LIKE @Query OR MidCategory LIKE @Query
-                 OR SubCategory LIKE @Query OR ProductType LIKE @Query OR Material LIKE @Query)";
+        sql += @" AND (p.Title LIKE @Query OR p.Category LIKE @Query OR p.MidCategory LIKE @Query
+                 OR p.SubCategory LIKE @Query OR p.ProductType LIKE @Query OR p.Material LIKE @Query OR mp.Brand LIKE @Query)";
         parameters.Add("Query", $"%{q.Trim()}%");
+    }
+
+    if (!string.IsNullOrWhiteSpace(brand))
+    {
+        sql += " AND (mp.Brand = @Brand OR p.Source = @Brand OR (p.Source = 'ikea' AND @Brand = 'IKEA') OR (p.Source = 'ozdilek' AND (@Brand = 'Özdilek' OR @Brand = 'Ozdilek')))";
+        parameters.Add("Brand", brand);
     }
 
     if (!string.IsNullOrWhiteSpace(category))
     {
-        sql += " AND Category = @Category";
+        sql += " AND p.Category = @Category";
         parameters.Add("Category", category);
     }
 
     if (!string.IsNullOrWhiteSpace(midCategory))
     {
-        sql += " AND MidCategory = @MidCategory";
+        sql += " AND p.MidCategory = @MidCategory";
         parameters.Add("MidCategory", midCategory);
     }
 
     if (!string.IsNullOrWhiteSpace(subCategory))
     {
-        sql += " AND SubCategory = @SubCategory";
+        sql += " AND p.SubCategory = @SubCategory";
         parameters.Add("SubCategory", subCategory);
     }
 
     if (!string.IsNullOrWhiteSpace(color))
     {
-        sql += " AND Color = @Color";
+        sql += " AND p.Color = @Color";
         parameters.Add("Color", color);
     }
 
     if (!string.IsNullOrWhiteSpace(dimensions))
     {
-        sql += " AND Dimensions = @Dimensions";
+        sql += " AND p.Dimensions = @Dimensions";
         parameters.Add("Dimensions", dimensions);
     }
 
     if (!string.IsNullOrWhiteSpace(productType))
     {
-        sql += " AND ProductType = @ProductType";
+        sql += " AND p.ProductType = @ProductType";
         parameters.Add("ProductType", productType);
     }
 
     if (!string.IsNullOrWhiteSpace(material))
     {
-        sql += " AND Material = @Material";
+        sql += " AND p.Material = @Material";
         parameters.Add("Material", material);
     }
 
     if (minPrice.HasValue)
     {
-        sql += " AND Price >= @MinPrice";
+        sql += " AND p.Price >= @MinPrice";
         parameters.Add("MinPrice", minPrice.Value);
     }
 
     if (maxPrice.HasValue)
     {
-        sql += " AND Price <= @MaxPrice";
+        sql += " AND p.Price <= @MaxPrice";
         parameters.Add("MaxPrice", maxPrice.Value);
     }
 
     sql += $" ORDER BY {orderBy}";
 
     using var db = new SqlConnection(connectionString);
-    var ikeaProducts = await db.QueryAsync(sql, parameters);
-    return Results.Ok(ikeaProducts);
+    var mobilyaProducts = await db.QueryAsync(sql, parameters);
+    return Results.Ok(mobilyaProducts);
+});
+
+app.MapGet("/api/ikea/products", async (
+    string? q,
+    string? brand,
+    string? category,
+    string? midCategory,
+    string? subCategory,
+    string? color,
+    string? dimensions,
+    string? productType,
+    string? material,
+    decimal? minPrice,
+    decimal? maxPrice,
+    string? sort) =>
+{
+    var orderBy = sort switch
+    {
+        "price_desc" => "Price DESC",
+        "price_asc" => "Price ASC",
+        "name_desc" => "Title DESC",
+        _ => "Title ASC"
+    };
+
+    var sql = @"
+        SELECT p.Id, p.ExternalId, p.Title, p.ImageUrl, p.Price, p.RegularPrice, p.ProductUrl,
+               p.Category, p.MidCategory, p.SubCategory, p.Color, p.Dimensions, p.ProductType, p.Material,
+               COALESCE(NULLIF(mp.Brand, ''), p.Source) AS Brand, p.Source
+        FROM Products p
+        LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id
+        WHERE p.Source = 'ikea'";
+
+    var parameters = new DynamicParameters();
+
+    if (!string.IsNullOrWhiteSpace(q))
+    {
+        sql += @" AND (p.Title LIKE @Query OR p.Category LIKE @Query OR p.MidCategory LIKE @Query
+                 OR p.SubCategory LIKE @Query OR p.ProductType LIKE @Query OR p.Material LIKE @Query OR mp.Brand LIKE @Query)";
+        parameters.Add("Query", $"%{q.Trim()}%");
+    }
+
+    if (!string.IsNullOrWhiteSpace(brand))
+    {
+        sql += " AND (mp.Brand = @Brand OR p.Source = @Brand)";
+        parameters.Add("Brand", brand);
+    }
+
+    if (!string.IsNullOrWhiteSpace(category))
+    {
+        sql += " AND p.Category = @Category";
+        parameters.Add("Category", category);
+    }
+
+    if (!string.IsNullOrWhiteSpace(midCategory))
+    {
+        sql += " AND p.MidCategory = @MidCategory";
+        parameters.Add("MidCategory", midCategory);
+    }
+
+    if (!string.IsNullOrWhiteSpace(subCategory))
+    {
+        sql += " AND p.SubCategory = @SubCategory";
+        parameters.Add("SubCategory", subCategory);
+    }
+
+    if (!string.IsNullOrWhiteSpace(color))
+    {
+        sql += " AND p.Color = @Color";
+        parameters.Add("Color", color);
+    }
+
+    if (!string.IsNullOrWhiteSpace(dimensions))
+    {
+        sql += " AND p.Dimensions = @Dimensions";
+        parameters.Add("Dimensions", dimensions);
+    }
+
+    if (!string.IsNullOrWhiteSpace(productType))
+    {
+        sql += " AND p.ProductType = @ProductType";
+        parameters.Add("ProductType", productType);
+    }
+
+    if (!string.IsNullOrWhiteSpace(material))
+    {
+        sql += " AND p.Material = @Material";
+        parameters.Add("Material", material);
+    }
+
+    if (minPrice.HasValue)
+    {
+        sql += " AND p.Price >= @MinPrice";
+        parameters.Add("MinPrice", minPrice.Value);
+    }
+
+    if (maxPrice.HasValue)
+    {
+        sql += " AND p.Price <= @MaxPrice";
+        parameters.Add("MaxPrice", maxPrice.Value);
+    }
+
+    sql += $" ORDER BY {orderBy}";
+
+    using var db = new SqlConnection(connectionString);
+    var mobilyaProducts = await db.QueryAsync(sql, parameters);
+    return Results.Ok(mobilyaProducts);
 });
 
 app.MapGet("/api/ikea/filters", async () =>
@@ -318,6 +454,84 @@ app.MapGet("/api/ikea/filters", async () =>
         ProductTypes = productTypes,
         Materials = materials
     });
+});
+
+app.MapGet("/api/mobilya/filters", async () =>
+{
+    using var db = new SqlConnection(connectionString);
+
+    var brands = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Brand
+        FROM (
+            SELECT mp.Brand FROM MasterProducts mp JOIN Products p ON p.MasterProductId = mp.Id WHERE mp.Brand IS NOT NULL AND mp.Brand <> '' AND p.Source IN ('ikea', 'ozdilek')
+            UNION
+            SELECT COALESCE(NULLIF(mp.Brand, ''), p.Source) AS Brand FROM Products p LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id WHERE p.Source IN ('ikea', 'ozdilek')
+        ) b WHERE Brand IS NOT NULL AND Brand <> '' ORDER BY Brand");
+
+    var categoryRows = await db.QueryAsync(@"
+        SELECT DISTINCT Category, MidCategory, SubCategory
+        FROM Products
+        WHERE Source IN ('ikea', 'ozdilek')
+          AND Category IS NOT NULL AND Category <> ''
+        ORDER BY Category, MidCategory, SubCategory");
+
+    var topCategories = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Category FROM Products
+        WHERE Source IN ('ikea', 'ozdilek') AND Category IS NOT NULL AND Category <> ''
+        ORDER BY Category");
+
+    var midCategories = await db.QueryAsync<string>(@"
+        SELECT DISTINCT MidCategory FROM Products
+        WHERE Source IN ('ikea', 'ozdilek') AND MidCategory IS NOT NULL AND MidCategory <> ''
+        ORDER BY MidCategory");
+
+    var subCategories = await db.QueryAsync<string>(@"
+        SELECT DISTINCT SubCategory FROM Products
+        WHERE Source IN ('ikea', 'ozdilek') AND SubCategory IS NOT NULL AND SubCategory <> ''
+        ORDER BY SubCategory");
+
+    var colors = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Color FROM Products WHERE Source IN ('ikea', 'ozdilek') AND Color IS NOT NULL AND Color <> '' ORDER BY Color");
+
+    var dimensions = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Dimensions FROM Products WHERE Source IN ('ikea', 'ozdilek') AND Dimensions IS NOT NULL AND Dimensions <> '' ORDER BY Dimensions");
+
+    var productTypes = await db.QueryAsync<string>(@"
+        SELECT DISTINCT ProductType FROM Products WHERE Source IN ('ikea', 'ozdilek') AND ProductType IS NOT NULL AND ProductType <> '' ORDER BY ProductType");
+
+    var materials = await db.QueryAsync<string>(@"
+        SELECT DISTINCT Material FROM Products WHERE Source IN ('ikea', 'ozdilek') AND Material IS NOT NULL AND Material <> '' ORDER BY Material");
+
+    return Results.Ok(new
+    {
+        Brands = brands,
+        CategoryTree = categoryRows,
+        TopCategories = topCategories,
+        MidCategories = midCategories,
+        SubCategories = subCategories,
+        Colors = colors,
+        Dimensions = dimensions,
+        ProductTypes = productTypes,
+        Materials = materials
+    });
+});
+
+app.MapGet("/api/suggestions", async (string? q, string? tab) =>
+{
+    if (string.IsNullOrWhiteSpace(q) || q.Trim().Length < 2)
+        return Results.Ok(Array.Empty<string>());
+
+    using var db = new SqlConnection(connectionString);
+    var normalizedTab = tab?.Trim().ToLowerInvariant();
+
+    var sql = normalizedTab switch
+    {
+        "mobilya" or "ikea" => @"SELECT TOP 6 Title FROM Products WHERE Source IN ('ikea', 'ozdilek') AND Title LIKE @Query ORDER BY Title",
+        _ => @"SELECT TOP 6 COALESCE(mp.CanonicalTitle, p.Title) AS Title FROM Products p LEFT JOIN MasterProducts mp ON p.MasterProductId = mp.Id WHERE p.Source NOT IN ('ikea', 'ozdilek') AND (p.Title LIKE @Query OR mp.CanonicalTitle LIKE @Query) GROUP BY COALESCE(mp.CanonicalTitle, p.Title) ORDER BY Title"
+    };
+
+    var suggestions = await db.QueryAsync<string>(sql, new { Query = $"%{q.Trim()}%" });
+    return Results.Ok(suggestions);
 });
 
 if (Directory.Exists(wwwrootPath))

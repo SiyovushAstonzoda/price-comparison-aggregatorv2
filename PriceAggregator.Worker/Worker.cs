@@ -34,9 +34,9 @@ public class Worker : BackgroundService
         "su", "nutella", "çay", "kahve", "makarna", "zeytinyağı", "peynir", "yumurta"
     };
 
-    private readonly string[] _ikeaSearchTerms =
+    private readonly string[] _mobilyaSearchTerms =
     {
-        "sandalye", "masa", "koltuk", "dolap", "lamba", "yatak", "sehpa", "mutfak"
+        "sandalye", "mutfak sandalyesi", "masa", "koltuk", "dolap", "lamba", "yatak", "sehpa", "mutfak", "yatak örtüsü"
     };
 
     private async Task RunScrapeAsync()
@@ -53,17 +53,11 @@ public class Worker : BackgroundService
         var httpClient6 = new HttpClient();
         var hakmarExpressScraper = new HakmarExpressScraper(httpClient6);
 
-        // var httpClient8 = new HttpClient();
-        // var cagriMarketScraper = new CagriMarketScraper(httpClient8);
-
-        // var httpClient4 = new HttpClient();
-        // var evideaScraper = new EvideaScraper(httpClient4);
-
-        // var httpClient5 = new HttpClient();
-        // var mionScraper = new MionScraper(httpClient5);
-
         var httpClient7 = new HttpClient();
         var ikeaScraper = new IkeaScraper(httpClient7);
+
+        var httpClient9 = new HttpClient();
+        var ozdilekScraper = new OzdilekScraper(httpClient9);
 
 
         var repo = new ProductRepository(_connectionString);
@@ -101,12 +95,17 @@ public class Worker : BackgroundService
             //await Task.Delay(TimeSpan.FromSeconds(3));
         }
 
-        foreach (var searchItem in _ikeaSearchTerms)
+        foreach (var searchItem in _mobilyaSearchTerms)
         {
-            Logger.Log($"--- IKEA search '{searchItem}' ---");
+            Logger.Log($"--- Mobilya search '{searchItem}' ---");
+
             var ikeaRes = await RunScraperSafe("ikea", () => ikeaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
             savedCount += ikeaRes.saved;
             failedCount += ikeaRes.failed;
+
+            var ozdilekRes = await RunScraperSafe("ozdilek", () => ozdilekScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+            savedCount += ozdilekRes.saved;
+            failedCount += ozdilekRes.failed;
         }
 
         Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");

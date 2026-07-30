@@ -1240,11 +1240,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
+      "projectUniqueName": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
       "projectName": "PriceAggregator.Scraper",
-      "projectPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
+      "projectPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
       "packagesPath": "/Users/sariadarkazanli/.nuget/packages/",
-      "outputPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Scraper/obj/",
+      "outputPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Scraper/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/sariadarkazanli/.nuget/NuGet/NuGet.Config"
@@ -1260,8 +1260,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Core/PriceAggregator.Core.csproj": {
-              "projectPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Core/PriceAggregator.Core.csproj"
+            "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Core/PriceAggregator.Core.csproj": {
+              "projectPath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Core/PriceAggregator.Core.csproj"
             }
           }
         }

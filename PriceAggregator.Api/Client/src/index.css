@@ -725,10 +725,10 @@ body {
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
-.nav-tab#tabIkea.active {
-  background: #0058a3;
-  border-color: #0058a3;
-  color: #ffcc00;
+.nav-tab#tabMobilya.active {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: white;
 }
 
 /* IKEA Hero Banner */

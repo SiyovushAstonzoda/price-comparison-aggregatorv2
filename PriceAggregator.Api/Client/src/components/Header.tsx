@@ -35,13 +35,13 @@ export default function Header({
           </button>
           <button
             type="button"
-            id="tabIkea"
-            className={`nav-tab${section === "ikea" ? " active" : ""}`}
+            id="tabMobilya"
+            className={`nav-tab${section === "mobilya" ? " active" : ""}`}
             role="tab"
-            aria-selected={section === "ikea"}
-            onClick={() => onSectionChange("ikea")}
+            aria-selected={section === "mobilya"}
+            onClick={() => onSectionChange("mobilya")}
           >
-            <span className="tab-icon">🛏️</span> IKEA Mağazası
+            <span className="tab-icon">🛋️</span> Mobilya
           </button>
         </nav>
 
@@ -55,7 +55,7 @@ export default function Header({
             placeholder={
               section === "market"
                 ? "Ürün veya marka ara..."
-                : "IKEA ürünü ara (sandalye, masa, dolap...)"
+                : "IKEA veya Özdilek ürünü ara (sandalye, masa, nevresim...)"
             }
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}

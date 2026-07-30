@@ -38,12 +38,19 @@ export async function getProductOffers(id: number) {
   return fetchJson<import("./types").ProductOffer[]>(`${API_BASE}/products/${id}`);
 }
 
-export async function getIkeaProducts(params: URLSearchParams) {
+export async function getMobilyaProducts(params: URLSearchParams) {
   const query = params.toString();
-  const url = query ? `${API_BASE}/ikea/products?${query}` : `${API_BASE}/ikea/products`;
-  return fetchJson<import("./types").IkeaProduct[]>(url);
+  const url = query ? `${API_BASE}/mobilya/products?${query}` : `${API_BASE}/mobilya/products`;
+  return fetchJson<import("./types").MobilyaProduct[]>(url);
 }
 
-export async function getIkeaFilters() {
-  return fetchJson<import("./types").IkeaFilters>(`${API_BASE}/ikea/filters`);
+export async function getMobilyaFilters() {
+  return fetchJson<import("./types").MobilyaFilters>(`${API_BASE}/mobilya/filters`);
 }
+
+export async function getMobilyaBrands() {
+  return fetchJson<string[]>(`${API_BASE}/mobilya/brands`);
+}
+
+export const getIkeaProducts = getMobilyaProducts;
+export const getIkeaFilters = getMobilyaFilters;

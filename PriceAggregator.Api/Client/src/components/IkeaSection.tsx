@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { formatPrice, getIkeaFilters, getIkeaProducts } from "../api";
-import type { IkeaFilterState, IkeaFilters, IkeaProduct } from "../types";
+import { formatPrice, getMobilyaFilters, getMobilyaProducts } from "../api";
+import type { MobilyaFilterState, MobilyaFilters, MobilyaProduct } from "../types";
 
-const defaultFilters: IkeaFilterState = {
+const defaultFilters: MobilyaFilterState = {
   q: "",
+  brand: "",
   category: "",
   midCategory: "",
   subCategory: "",
@@ -16,13 +17,14 @@ const defaultFilters: IkeaFilterState = {
   maxPrice: "",
 };
 
-interface IkeaSectionProps {
+interface MobilyaSectionProps {
   searchQuery: string;
 }
 
-function buildParams(filters: IkeaFilterState) {
+function buildParams(filters: MobilyaFilterState) {
   const params = new URLSearchParams();
   if (filters.q) params.set("q", filters.q);
+  if (filters.brand) params.set("brand", filters.brand);
   if (filters.category) params.set("category", filters.category);
   if (filters.midCategory) params.set("midCategory", filters.midCategory);
   if (filters.subCategory) params.set("subCategory", filters.subCategory);
@@ -36,10 +38,10 @@ function buildParams(filters: IkeaFilterState) {
   return params;
 }
 
-export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
-  const [filters, setFilters] = useState<IkeaFilterState>(defaultFilters);
-  const [meta, setMeta] = useState<IkeaFilters | null>(null);
-  const [products, setProducts] = useState<IkeaProduct[]>([]);
+export default function IkeaSection({ searchQuery }: MobilyaSectionProps) {
+  const [filters, setFilters] = useState<MobilyaFilterState>(defaultFilters);
+  const [meta, setMeta] = useState<MobilyaFilters | null>(null);
+  const [products, setProducts] = useState<MobilyaProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -48,7 +50,7 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
   }, [searchQuery]);
 
   useEffect(() => {
-    getIkeaFilters().then(setMeta).catch(console.error);
+    getMobilyaFilters().then(setMeta).catch(console.error);
   }, []);
 
   const paramsKey = useMemo(() => buildParams(filters).toString(), [filters]);
@@ -56,7 +58,7 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
   useEffect(() => {
     setLoading(true);
     setError(false);
-    getIkeaProducts(buildParams(filters))
+    getMobilyaProducts(buildParams(filters))
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
@@ -86,6 +88,7 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
 
   const activeTags = [
     filters.q && { key: "q" as const, label: `"${filters.q}"` },
+    filters.brand && { key: "brand" as const, label: `Mağaza: ${filters.brand}` },
     filters.category && { key: "category" as const, label: filters.category },
     filters.midCategory && { key: "midCategory" as const, label: filters.midCategory },
     filters.subCategory && { key: "subCategory" as const, label: filters.subCategory },
@@ -95,9 +98,9 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
     filters.material && { key: "material" as const, label: `Malzeme: ${filters.material}` },
     filters.minPrice && { key: "minPrice" as const, label: `Min ${filters.minPrice} TL` },
     filters.maxPrice && { key: "maxPrice" as const, label: `Max ${filters.maxPrice} TL` },
-  ].filter(Boolean) as Array<{ key: keyof IkeaFilterState; label: string }>;
+  ].filter(Boolean) as Array<{ key: keyof MobilyaFilterState; label: string }>;
 
-  const clearTag = (key: keyof IkeaFilterState) => {
+  const clearTag = (key: keyof MobilyaFilterState) => {
     setFilters((prev) => {
       const next = { ...prev, [key]: "" };
       if (key === "category") {
@@ -112,11 +115,14 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
 
   return (
     <main className="main-content">
-      <div className="ikea-hero-banner">
-        <div className="ikea-badge">IKEA</div>
+      <div className="ikea-hero-banner" style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)" }}>
+        <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
+          <span style={{ background: "#ffcc00", color: "#0058a3", fontWeight: 800, padding: "0.4rem 0.8rem", borderRadius: "8px", fontSize: "1.1rem" }}>IKEA</span>
+          <span style={{ background: "#059669", color: "white", fontWeight: 800, padding: "0.4rem 0.8rem", borderRadius: "8px", fontSize: "1.1rem" }}>Özdilek</span>
+        </div>
         <div>
-          <h2>IKEA Mobilya ve Ev Yaşam Kataloğu</h2>
-          <p>Sandalyeler, masalar, dolaplar, aydınlatma ve ev ürünleri kategorilerine göre filtreleyin</p>
+          <h2>Mobilya & Ev Yaşam Kataloğu</h2>
+          <p>IKEA ve Özdilek mobilya, ev tekstili, mutfak ve ev yaşam ürünlerini tek bölümde karşılaştırın</p>
         </div>
       </div>
 
@@ -143,11 +149,22 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
       <div className="ikea-layout">
         <aside className="filters-panel">
           <div className="filters-header">
-            <h2>IKEA Filtreleri</h2>
+            <h2>Mobilya Filtreleri</h2>
             <button type="button" className="clear-btn" onClick={clearAll}>
               Temizle
             </button>
           </div>
+
+          <FilterSelect
+            label="Mağaza / Marka"
+            value={filters.brand}
+            onChange={(v) => setFilters((p) => ({ ...p, brand: v }))}
+          >
+            <option value="">Tüm Mağazalar (IKEA & Özdilek)</option>
+            {(meta?.brands && meta.brands.length > 0 ? meta.brands : ["IKEA", "Özdilek"]).map((b) => (
+              <option key={b} value={b}>{b}</option>
+            ))}
+          </FilterSelect>
 
           <FilterSelect label="Ana kategori" value={filters.category} onChange={(v) => setCategory(v)}>
             <option value="">Tüm ana kategoriler</option>
@@ -221,7 +238,7 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
         <section className="products-section">
           <div className="results-bar">
             <p className="results-count">
-              {loading ? "" : error ? "" : products.length === 0 ? "Sonuç bulunamadı" : `${products.length} IKEA ürünü bulundu`}
+              {loading ? "" : error ? "" : products.length === 0 ? "Sonuç bulunamadı" : `${products.length} mobilya ürünü bulundu`}
             </p>
             <div className="active-filters">
               {activeTags.map(({ key, label }) => (
@@ -246,7 +263,7 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
             {!loading && error && (
               <div className="state-message">
                 <h3>Bir hata oluştu</h3>
-                <p>IKEA ürünleri yüklenemedi.</p>
+                <p>Mobilya ürünleri yüklenemedi.</p>
               </div>
             )}
             {!loading && !error && products.length === 0 && (
@@ -255,41 +272,49 @@ export default function IkeaSection({ searchQuery }: IkeaSectionProps) {
                 <p>Seçilen filtrelerde ürün yok.</p>
               </div>
             )}
-            {!loading && !error && products.map((product) => (
-              <article key={product.id} className="product-card">
-                <div className="product-image-wrap">
-                  {product.imageUrl ? (
-                    <img src={product.imageUrl} className="product-image" alt={product.title} loading="lazy" />
-                  ) : (
-                    <svg className="product-image-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                    </svg>
-                  )}
-                </div>
-                <div className="product-body">
-                  <p className="product-brand" style={{ color: "#0058a3", fontWeight: 700 }}>IKEA</p>
-                  <h3 className="product-title">{product.title}</h3>
-                  <div className="tag-badge-group">
-                    {product.subCategory && <span className="tag-badge tag-category">{product.subCategory}</span>}
-                    {product.midCategory && <span className="tag-badge tag-category-dim">{product.midCategory}</span>}
-                    {product.color && <span className="tag-badge tag-color">🎨 {product.color}</span>}
-                    {product.productType && <span className="tag-badge tag-type">🪑 {product.productType}</span>}
-                    {product.material && <span className="tag-badge tag-material">🧱 {product.material}</span>}
-                    {product.dimensions && <span className="tag-badge tag-dimensions">📏 {product.dimensions}</span>}
+            {!loading && !error && products.map((product) => {
+              const storeBrand = product.brand || (product.source === "ozdilek" ? "Özdilek" : "IKEA");
+              const isOzdilek = storeBrand.toLowerCase().includes("ozdilek") || storeBrand.toLowerCase().includes("özdilek") || product.source === "ozdilek";
+              const accentColor = isOzdilek ? "#059669" : "#0058a3";
+
+              return (
+                <article key={product.id} className="product-card">
+                  <div className="product-image-wrap">
+                    {product.imageUrl ? (
+                      <img src={product.imageUrl} className="product-image" alt={product.title} loading="lazy" />
+                    ) : (
+                      <svg className="product-image-placeholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                      </svg>
+                    )}
                   </div>
-                  <div className="product-footer" style={{ marginTop: "0.75rem" }}>
-                    <div>
-                      <span className="product-price-label">Fiyat</span>
-                      <span className="product-price" style={{ color: "#0058a3" }}>{formatPrice(product.price)}</span>
+                  <div className="product-body">
+                    <p className="product-brand" style={{ color: accentColor, fontWeight: 700 }}>
+                      {storeBrand}
+                    </p>
+                    <h3 className="product-title">{product.title}</h3>
+                    <div className="tag-badge-group">
+                      {product.subCategory && <span className="tag-badge tag-category">{product.subCategory}</span>}
+                      {product.midCategory && <span className="tag-badge tag-category-dim">{product.midCategory}</span>}
+                      {product.color && <span className="tag-badge tag-color">🎨 {product.color}</span>}
+                      {product.productType && <span className="tag-badge tag-type">🪑 {product.productType}</span>}
+                      {product.material && <span className="tag-badge tag-material">🧱 {product.material}</span>}
+                      {product.dimensions && <span className="tag-badge tag-dimensions">📏 {product.dimensions}</span>}
                     </div>
-                    <a href={product.productUrl} target="_blank" rel="noopener" className="offer-link" style={{ background: "#0058a3", color: "white" }}>
-                      İncele ↗
-                    </a>
+                    <div className="product-footer" style={{ marginTop: "0.75rem" }}>
+                      <div>
+                        <span className="product-price-label">Fiyat</span>
+                        <span className="product-price" style={{ color: accentColor }}>{formatPrice(product.price)}</span>
+                      </div>
+                      <a href={product.productUrl} target="_blank" rel="noopener" className="offer-link" style={{ background: accentColor, color: "white" }}>
+                        İncele ↗
+                      </a>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </section>
       </div>

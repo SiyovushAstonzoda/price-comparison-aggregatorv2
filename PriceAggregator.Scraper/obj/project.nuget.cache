@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Uyld4CM9GD4=",
+  "dgSpecHash": "kfz1f4IwIG0=",
   "success": true,
-  "projectFilePath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2-main/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
+  "projectFilePath": "/Users/sariadarkazanli/Downloads/price-comparison-aggregatorv2/PriceAggregator.Scraper/PriceAggregator.Scraper.csproj",
   "expectedPackageFiles": [
     "/Users/sariadarkazanli/.nuget/packages/dapper/2.1.79/dapper.2.1.79.nupkg.sha512",
     "/Users/sariadarkazanli/.nuget/packages/microsoft.bcl.cryptography/9.0.13/microsoft.bcl.cryptography.9.0.13.nupkg.sha512",

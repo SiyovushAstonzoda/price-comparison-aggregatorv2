@@ -18,7 +18,7 @@ export default function App() {
   const [section, setSection] = useState<Section>("market");
   const [searchQuery, setSearchQuery] = useState("");
   const [marketFilters, setMarketFilters] = useState<MarketFilters>(defaultMarketFilters);
-  const [ikeaSearch, setIkeaSearch] = useState("");
+  const [mobilyaSearch, setMobilyaSearch] = useState("");
   const [modal, setModal] = useState<{ id: number; title: string } | null>(null);
 
   const handleSearch = useCallback(
@@ -27,15 +27,15 @@ export default function App() {
       if (section === "market") {
         setMarketFilters((prev) => ({ ...prev, q: searchQuery.trim() }));
       } else {
-        setIkeaSearch(searchQuery.trim());
+        setMobilyaSearch(searchQuery.trim());
       }
     },
     [section, searchQuery]
   );
 
   useEffect(() => {
-    setSearchQuery(section === "market" ? marketFilters.q : ikeaSearch);
-  }, [section, marketFilters.q, ikeaSearch]);
+    setSearchQuery(section === "market" ? marketFilters.q : mobilyaSearch);
+  }, [section, marketFilters.q, mobilyaSearch]);
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function App() {
           onProductClick={(id, title) => setModal({ id, title })}
         />
       ) : (
-        <IkeaSection searchQuery={ikeaSearch} />
+        <IkeaSection searchQuery={mobilyaSearch} />
       )}
 
       {modal && (

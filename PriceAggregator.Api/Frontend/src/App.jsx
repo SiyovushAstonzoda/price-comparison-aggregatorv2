@@ -15,7 +15,16 @@ function getApiBase() {
 
 const API_BASE = getApiBase();
 
+function getTabEndpoints(tab) {
+  if (tab === "mobilya") {
+    return { products: "/mobilya/products", brands: "/mobilya/brands" };
+  }
+  return { products: "/products", brands: "/brands" };
+}
+
 export default function App() {
+  const [activeTab, setActiveTab] = useState("market"); // "market" | "mobilya"
+
   // Input states (draft)
   const [searchInput, setSearchInput] = useState("");
   const [brand, setBrand] = useState("");
@@ -41,18 +50,37 @@ export default function App() {
   // Modal state
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Load brands on mount
+  // Load brands when activeTab changes
   useEffect(() => {
-    fetch(`${API_BASE}/brands`)
+    const { brands: brandsEndpoint } = getTabEndpoints(activeTab);
+    fetch(`${API_BASE}${brandsEndpoint}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch brands");
         return res.json();
       })
       .then((data) => setBrands(data))
       .catch((err) => console.error("Failed to load brands:", err));
-  }, []);
+  }, [activeTab]);
 
-  // Fetch products whenever appliedFilters change
+  // Reset filters when tab changes
+  const handleTabChange = (newTab) => {
+    if (newTab === activeTab) return;
+    setActiveTab(newTab);
+    setSearchInput("");
+    setBrand("");
+    setSort("name");
+    setMinPrice("");
+    setMaxPrice("");
+    setAppliedFilters({
+      q: "",
+      brand: "",
+      sort: "name",
+      minPrice: "",
+      maxPrice: "",
+    });
+  };
+
+  // Fetch products whenever appliedFilters or activeTab change
   const fetchProducts = useCallback(() => {
     setLoading(true);
     setError(false);
@@ -65,7 +93,8 @@ export default function App() {
     if (appliedFilters.maxPrice) params.set("maxPrice", appliedFilters.maxPrice);
 
     const queryStr = params.toString();
-    const url = queryStr ? `${API_BASE}/products?${queryStr}` : `${API_BASE}/products`;
+    const { products: productsEndpoint } = getTabEndpoints(activeTab);
+    const url = queryStr ? `${API_BASE}${productsEndpoint}?${queryStr}` : `${API_BASE}${productsEndpoint}`;
 
     fetch(url)
       .then((res) => {
@@ -81,18 +110,19 @@ export default function App() {
         setError(true);
         setLoading(false);
       });
-  }, [appliedFilters]);
+  }, [appliedFilters, activeTab]);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
   // Handle Search Submit
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
+  const handleSearchSubmit = (e, overrideQuery) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const queryToApply = (overrideQuery !== undefined ? overrideQuery : searchInput).trim();
     setAppliedFilters((prev) => ({
       ...prev,
-      q: searchInput.trim(),
+      q: queryToApply,
       brand,
       sort,
       minPrice,
@@ -168,6 +198,9 @@ export default function App() {
         searchInput={searchInput}
         setSearchInput={setSearchInput}
         onSearchSubmit={handleSearchSubmit}
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        apiBase={API_BASE}
       />
 
       <main className="mx-auto max-w-[1280px] p-5 min-[841px]:p-8 grid grid-cols-1 min-[841px]:grid-cols-[260px_1fr] gap-8 items-start">
