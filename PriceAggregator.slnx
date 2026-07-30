@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PriceAggregator.Api/PriceAggregator.Api.csproj" />
+    <Project Path="src/PriceAggregator.Application/PriceAggregator.Application.csproj" />
+    <Project Path="src/PriceAggregator.Core/PriceAggregator.Core.csproj" />
+    <Project Path="src/PriceAggregator.Infrastructure/PriceAggregator.Infrastructure.csproj" />
+    <Project Path="src/PriceAggregator.Worker/PriceAggregator.Worker.csproj" />
+  </Folder>
+</Solution>
