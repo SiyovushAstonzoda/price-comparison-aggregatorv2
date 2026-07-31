@@ -14,17 +14,6 @@ var ikeaScraper = new IkeaScraper(new HttpClient());
 var repo = new ProductRepository(connectionString);
 var matchingService = new MatchingService(connectionString);
 
-// The cosmetics sector is browsed by category rather than searched by keyword, so it's a
-// separate pass rather than another entry in the search-term loop below. Gated behind an
-// argument (`dotnet run -- kozmetik`) because a full sweep is ~26 category paths x 2 stores
-// and takes far longer than one grocery search.
-if (args.Contains("kozmetik", StringComparer.OrdinalIgnoreCase))
-{
-    var cosmeticsJob = new CosmeticsScrapeJob(repo, matchingService);
-    await cosmeticsJob.RunAsync();
-    return;
-}
-
 // Grocery search terms return almost nothing on the furniture/home stores
 // (evidea, mion, ikea) — these terms match their actual catalog instead.
 var marketSearchTerms = new[] { "su", "nutella", "çay", "kahve", "makarna", "zeytinyağı", "peynir", "yumurta" };
@@ -66,6 +55,10 @@ foreach (var searchItem in mobilyaSearchTerms)
     var ikeaRes = await RunScraperSafe("ikea", () => ikeaScraper.FetchProductsAsync(searchItem), searchItem);
     savedCount += ikeaRes.saved; failedCount += ikeaRes.failed;
 }
+
+Logger.Log("--- Scraping kozmetik ---");
+var cosmeticsJob = new CosmeticsScrapeJob(repo, matchingService);
+await cosmeticsJob.RunAsync();
 
 Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
 

@@ -1,7 +1,7 @@
 namespace PriceAggregator.Core;
 
 // Splits scraped products into the top-level sectors the app shows ("Market", "Mobilya",
-// "Sağlık, Bakım, Kozmetik"). These sector names become the true root Categories — every
+// "Kişisel Bakım, Kozmetik, Sağlık"). These sector names become the true root Categories — every
 // other category nests underneath one of them. Furniture/home sources never provide real
 // category data, so their products land directly on the sector root instead of being run
 // through CategoryClassifier's grocery keyword rules (which produced false positives like
@@ -15,7 +15,14 @@ public static class SectorClassifier
 
     public const string MarketSectorName = "Market";
     public const string MobilyaSectorName = "Mobilya";
-    public const string KozmetikSectorName = "Sağlık, Bakım, Kozmetik";
+
+    // Must stay textually identical to what CosmeticsCategorySynonyms canonicalizes "Kozmetik"
+    // to (Migros's own real root breadcrumb spelling) — CategoryResolver.ResolveBreadcrumbOnlyAsync
+    // feeds that canonicalized name back into FindOrCreateAsync scoped to this same sector root,
+    // and a mismatch here used to make it match on Slug and fail, creating a redundant second
+    // "cosmetics root" node one level below this one on every scrape run instead of collapsing
+    // into it.
+    public const string KozmetikSectorName = "Kişisel Bakım, Kozmetik, Sağlık";
 
     // Sector used to be a pure function of the source, which worked while every source sold
     // exactly one kind of thing. Migros and MacroCenter sell both groceries AND cosmetics

@@ -29,8 +29,17 @@ public static class CosmeticsCategorySynonyms
     {
         (string Source, string Canonical)[] pairs =
         [
-            // Store section roots
-            ("Kozmetik", "Kişisel Bakım, Kozmetik, Sağlık"),
+            // Store section roots — must resolve to the exact same string as
+            // SectorClassifier.KozmetikSectorName, or this collapses onto a redundant child of
+            // the sector root instead of the sector root itself (see that constant's docs).
+            ("Kozmetik", SectorClassifier.KozmetikSectorName),
+
+            // Some sources also send a bare "Kişisel Bakım" as a Root/Parent breadcrumb — that's
+            // just this same section root under its own short name, not a distinct department.
+            // Left unmapped, it created its own sibling duplicate next to the real section root
+            // every scrape run (sql/008_merge_duplicate_kozmetik_root.sql cleans up the ones
+            // that already exist).
+            ("Kişisel Bakım", SectorClassifier.KozmetikSectorName),
 
             // Department level (children of the section root)
             ("Ağdalar & Tüy Dökücüler", "Ağda, Epilasyon"),
