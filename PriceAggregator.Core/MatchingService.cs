@@ -100,6 +100,7 @@ public class MatchingService
     {
         "pet", "sise", "su", "dogal", "kaynak", "sade"
     };
+
     private static readonly Dictionary<string, string> ShapeAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         ["kalem"] = "penne rigate",
@@ -107,7 +108,7 @@ public class MatchingService
         // ["burgu"] = "fusilli",
     };
 
-    private string ApplyShapeAliases(string text)
+    private static string ApplyShapeAliases(string text)
     {
         foreach (var (alias, canonical) in ShapeAliases)
         {
@@ -116,132 +117,33 @@ public class MatchingService
         return text;
     }
 
-    private HashSet<string> Tokenize(string text, string? brand)
+    // Product-title-specific tokenization: strips brand name, units, and packaging
+    // filler words, on top of TextSimilarity's generic normalization/splitting.
+    private static HashSet<string> TokenizeProductTitle(string text, string? brand)
     {
-        if (string.IsNullOrWhiteSpace(text)) return new HashSet<string>();
-
         text = ApplyShapeAliases(text);
-        var normalized = TurkishNormalizer.Normalize(text);
-        var cleaned = new string(normalized.Select(c =>
-            char.IsLetterOrDigit(c) || char.IsWhiteSpace(c) ? c : ' ').ToArray());
 
         var brandTokens = string.IsNullOrWhiteSpace(brand)
-            ? new HashSet<string>()
-            : TurkishNormalizer.Normalize(brand).Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+            ? Enumerable.Empty<string>()
+            : TurkishNormalizer.Normalize(brand).Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        return cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        var exclude = UnitWords.Union(DescriptorFillerWords).Union(brandTokens);
+
+        // length > 2 here (vs TextSimilarity's generic length > 1) — drops short
+        // noise fragments that are common in product titles specifically.
+        return TextSimilarity.Tokenize(text, exclude)
             .Where(w => w.Length > 2)
-            .Where(w => !brandTokens.Contains(w))
-            .Where(w => !UnitWords.Contains(w))
-            .Where(w => !DescriptorFillerWords.Contains(w))
-            .Where(w => !w.All(char.IsDigit))
             .ToHashSet();
     }
 
-    // Two tokens are "the same word" if identical, or if one is the other's root
-    // plus a short Turkish suffix (handles çay/çayı, tiryaki/tiryakiler, etc.)
-    private static bool TokensMatch(string a, string b)
+    private static double CalculateSimilarity(string title1, string title2, string brand)
     {
-        if (a == b) return true;
+        var tokens1 = TokenizeProductTitle(title1, brand);
+        var tokens2 = TokenizeProductTitle(title2, brand);
 
-        // Turkish-suffix case: one word is a prefix of the other (çay / çayı)
-        var shorter = a.Length <= b.Length ? a : b;
-        var longer = a.Length <= b.Length ? b : a;
-        if (longer.StartsWith(shorter, StringComparison.Ordinal) && (longer.Length - shorter.Length) <= 3)
-            return true;
-
-        // Spelling-variant case: small edit distance relative to word length
-        // (handles transliteration differences like "Spaghetti" vs "Spagetti")
-        if (shorter.Length >= 5)
-        {
-            int maxAllowedDistance = shorter.Length <= 7 ? 1 : 2;
-            if (LevenshteinDistance(a, b) <= maxAllowedDistance)
-                return true;
-        }
-
-        return false;
+        // emptySetMeansCompatible: true — handles cases like Hakmar's generic
+        // "Erikli Su 5 Lt" (no distinguishing words left) matching Migros's more
+        // descriptive "Erikli Su Pet Şişe 5 L".
+        return TextSimilarity.Score(tokens1, tokens2, emptySetMeansCompatible: true);
     }
-
-    private static int LevenshteinDistance(string a, string b)
-    {
-        var dp = new int[a.Length + 1, b.Length + 1];
-
-        for (int i = 0; i <= a.Length; i++) dp[i, 0] = i;
-        for (int j = 0; j <= b.Length; j++) dp[0, j] = j;
-
-        for (int i = 1; i <= a.Length; i++)
-        {
-            for (int j = 1; j <= b.Length; j++)
-            {
-                int cost = a[i - 1] == b[j - 1] ? 0 : 1;
-                dp[i, j] = Math.Min(
-                    Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
-                    dp[i - 1, j - 1] + cost);
-            }
-        }
-
-        return dp[a.Length, b.Length];
-    }
-
-    private double CalculateSimilarity(string title1, string title2, string brand)
-    {
-        var tokens1 = Tokenize(title1, brand);
-        var tokens2 = Tokenize(title2, brand);
-
-        if (tokens1.Count == 0 && tokens2.Count == 0) return 1.0;
-        if (tokens1.Count == 0 || tokens2.Count == 0) return 1.0; // your existing empty-set rule (Erikli/pet-şişe case)
-
-        var remaining = new HashSet<string>(tokens2);
-        int matches = 0;
-
-        foreach (var t1 in tokens1)
-        {
-            var match = remaining.FirstOrDefault(t2 => TokensMatch(t1, t2));
-            if (match != null)
-            {
-                matches++;
-                remaining.Remove(match);
-            }
-        }
-
-        int union = tokens1.Count + tokens2.Count - matches;
-        return (double)matches / union;
-    }
-
-    /*private double CalculateSimilarity(string title1, string title2, string brand)
-    {
-        var tokens1 = Tokenize(title1, brand);
-        var tokens2 = Tokenize(title2, brand);
-
-        if (tokens1.Count == 0 && tokens2.Count == 0) return 1.0;
-        if (tokens1.Count == 0 || tokens2.Count == 0) return 0.0;
-
-        // Full containment: every token of the smaller set has a fuzzy match in the larger set,
-        // with nothing left conflicting. Handles "official name" vs "shorter alias" cases
-        // (e.g. "Penne Rigate (Kalem)" vs "Kalem") without being fooled by variant codes
-        // (e.g. "6-7" vs "4-0"), since containment requires ALL smaller-set tokens to match.
-        bool oneWayContainment(HashSet<string> smaller, HashSet<string> larger) =>
-            smaller.All(s => larger.Any(l => TokensMatch(s, l)));
-
-        if (tokens1.Count <= tokens2.Count && oneWayContainment(tokens1, tokens2))
-            return 1.0;
-        if (tokens2.Count < tokens1.Count && oneWayContainment(tokens2, tokens1))
-            return 1.0;
-
-        var remaining = new HashSet<string>(tokens2);
-        int matches = 0;
-
-        foreach (var t1 in tokens1)
-        {
-            var match = remaining.FirstOrDefault(t2 => TokensMatch(t1, t2));
-            if (match != null)
-            {
-                matches++;
-                remaining.Remove(match);
-            }
-        }
-
-        int union = tokens1.Count + tokens2.Count - matches;
-        return (double)matches / union;
-    }*/
 }

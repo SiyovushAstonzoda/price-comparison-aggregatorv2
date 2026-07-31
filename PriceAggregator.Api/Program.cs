@@ -203,6 +203,42 @@ app.MapGet("/api/categories", async () =>
     return Results.Ok(rows);
 });
 
+app.MapGet("/api/admin/category-review", async () =>
+{
+    using var db = new SqlConnection(connectionString);
+    //var pending = await db.QueryAsync(@"
+    var pending = await db.QueryAsync<CategoryReviewDto>(@"
+        SELECT rq.Id, rq.RawCategoryText, rq.Score, c.Name AS SuggestedCategory, rq.SuggestedCategoryId
+        FROM CategoryReviewQueue rq
+        LEFT JOIN Categories c ON c.Id = rq.SuggestedCategoryId
+        WHERE rq.Status = 'Pending'
+        ORDER BY rq.Score DESC");
+    return Results.Ok(pending);
+});
+
+app.MapPost("/api/admin/category-review/{id}/approve", async (int id) =>
+{
+    using var db = new SqlConnection(connectionString);
+    var row = await db.QuerySingleOrDefaultAsync<(string RawCategoryText, int? SuggestedCategoryId)>(
+        "SELECT RawCategoryText, SuggestedCategoryId FROM CategoryReviewQueue WHERE Id = @Id", new { Id = id });
+
+    if (row.SuggestedCategoryId.HasValue)
+    {
+        await db.ExecuteAsync(
+            "INSERT INTO CategoryRawMap (RawCategoryText, CategoryId) VALUES (@Raw, @CatId)",
+            new { Raw = row.RawCategoryText, CatId = row.SuggestedCategoryId });
+    }
+    await db.ExecuteAsync("UPDATE CategoryReviewQueue SET Status = 'Approved' WHERE Id = @Id", new { Id = id });
+    return Results.Ok();
+});
+
+app.MapPost("/api/admin/category-review/{id}/reject", async (int id) =>
+{
+    using var db = new SqlConnection(connectionString);
+    await db.ExecuteAsync("UPDATE CategoryReviewQueue SET Status = 'Rejected' WHERE Id = @Id", new { Id = id });
+    return Results.Ok();
+});
+
 app.Run();
 
 public record DealRow(
@@ -218,3 +254,4 @@ public record DealRow(
     string? ProductUrl);
 
 public record CategoryDto(int Id, string Name, string Slug, string? Icon, int ProductCount);
+public record CategoryReviewDto(int Id, string RawCategoryText, double Score, string? SuggestedCategory, int? SuggestedCategoryId); //new
