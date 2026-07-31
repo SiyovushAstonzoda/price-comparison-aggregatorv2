@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace PriceAggregator.Core;
 
@@ -77,10 +79,8 @@ public class MigrosScraper
         if (p.TryGetProperty("brand", out var brandEl) && brandEl.TryGetProperty("name", out var brandName))
             brand = brandName.GetString();
 
-
-        string? sourceCategory = null;
-        if (p.TryGetProperty("category", out var catEl) && catEl.TryGetProperty("name", out var catName))
-            sourceCategory = catName.GetString();
+        var (categoryName, parentName, rootName) = ParseCategory(p);
+        var (unitType, unitAmount, sourceUnitPrice) = ParseUnitInfo(p);
 
         return new ProductDto
         {
@@ -90,10 +90,70 @@ public class MigrosScraper
             ImageUrl = imageUrl,
             Price = p.TryGetProperty("shownPrice", out var price) ? price.GetInt32() / 100m : 0,
             RegularPrice = p.TryGetProperty("regularPrice", out var regPrice) ? regPrice.GetInt32() / 100m : 0,
-            SourceCategory = sourceCategory,
             ProductUrl = p.TryGetProperty("prettyName", out var pretty)
                 ? $"https://www.migros.com.tr/{pretty.GetString()}"
-                : ""
+                : "",
+            CategoryName = categoryName,
+            ParentCategoryName = parentName,
+            RootCategoryName = rootName,
+            SourceUnitType = unitType,
+            SourceUnitAmount = unitAmount,
+            SourceUnitPrice = sourceUnitPrice
         };
+    }
+
+    // Migros/MacroCenter share this JSON shape: "category" is the leaf category,
+    // "categoryAscendants" lists ancestors nearest-first (last element is the root).
+    internal static (string? Name, string? ParentName, string? RootName) ParseCategory(JsonElement p)
+    {
+        string? categoryName = p.TryGetProperty("category", out var categoryEl) && categoryEl.TryGetProperty("name", out var cn)
+            ? cn.GetString()
+            : null;
+
+        string? parentName = null, rootName = null;
+        if (p.TryGetProperty("categoryAscendants", out var ascendants) && ascendants.ValueKind == JsonValueKind.Array)
+        {
+            var items = ascendants.EnumerateArray().ToList();
+            if (items.Count == 1)
+            {
+                rootName = items[0].TryGetProperty("name", out var rn) ? rn.GetString() : null;
+            }
+            else if (items.Count > 1)
+            {
+                parentName = items[0].TryGetProperty("name", out var pn) ? pn.GetString() : null;
+                rootName = items[^1].TryGetProperty("name", out var rn2) ? rn2.GetString() : null;
+            }
+        }
+
+        return (categoryName, parentName, rootName);
+    }
+
+    // Migros/MacroCenter/Mion run on the same commerce platform, so their product JSON
+    // carries the same "unit"/"unitAmount" fields (e.g. GRAM/1000) and, for many items, a
+    // ready-made legally-required "(2499,50 TL/Kg)" unitPrice label — structured size data
+    // that's more reliable than guessing from the free-text title (see SizeParser).
+    internal static (string? UnitType, decimal? UnitAmount, decimal? SourceUnitPrice) ParseUnitInfo(JsonElement p)
+    {
+        string? unitType = p.TryGetProperty("unit", out var u) && u.ValueKind == JsonValueKind.String
+            ? u.GetString()
+            : null;
+
+        decimal? unitAmount = p.TryGetProperty("unitAmount", out var ua) && ua.TryGetDecimal(out var uav)
+            ? uav
+            : null;
+
+        decimal? sourceUnitPrice = null;
+        if (p.TryGetProperty("unitPrice", out var up) && up.ValueKind == JsonValueKind.String)
+        {
+            var match = Regex.Match(up.GetString() ?? "", @"[\d.,]+");
+            if (match.Success)
+            {
+                var numeric = match.Value.Replace(".", "").Replace(",", ".");
+                if (decimal.TryParse(numeric, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+                    sourceUnitPrice = value;
+            }
+        }
+
+        return (unitType, unitAmount, sourceUnitPrice);
     }
 }

@@ -3,16 +3,161 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tutumlu — Akıllı Fiyat Karşılaştırma</title>
+    <title>Tutumlu — Fiyat Karşılaştırma</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <div class="header-wrap">
+      <header class="site-header">
+        <div class="header-inner">
+          <a href="/" class="logo">
+            <span class="logo-icon">T</span>
+            <span class="logo-text">Tutumlu</span>
+          </a>
+
+          <button type="button" id="categoryMenuTrigger" class="category-nav-trigger">
+            <span class="category-hamburger">
+              <span></span><span></span><span></span>
+            </span>
+            <span>KATEGORİLER</span>
+          </button>
+
+          <div class="search-bar-wrap">
+            <form id="searchForm" class="search-bar" role="search">
+              <svg class="search-icon" viewBox="0 0 16 16" fill="none">
+                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.6" />
+                <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="Ürün veya marka ara..."
+                autocomplete="off"
+              />
+              <button type="submit" class="sr-only">Ara</button>
+            </form>
+            <div id="searchSuggestions" class="search-suggestions"></div>
+          </div>
+
+          <div class="header-actions">
+            <button type="button" class="login-btn">Giriş Yap</button>
+          </div>
+        </div>
+      </header>
+
+      <div id="categoryMegaMenu" class="category-mega-menu">
+        <div class="mega-menu-inner">
+          <ul class="mega-col-0"></ul>
+          <ul class="mega-col-1"></ul>
+          <div class="mega-col-2">
+            <p class="mega-col-2-title"></p>
+            <ul class="mega-col-2-list"></ul>
+          </div>
+          <div class="mega-col-3"></div>
+        </div>
+        <div class="mega-quicklinks">
+          <span class="mega-quicklinks-label">Hızlı Erişim</span>
+          <button type="button" class="mega-quicklink">Organik Ürünler</button>
+          <button type="button" class="mega-quicklink">Bebek &amp; Çocuk</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <aside class="filters-panel">
+        <div class="filters-header">
+          <h2>Filtreler</h2>
+          <button id="clearFilters" class="clear-btn" type="button">Temizle</button>
+        </div>
+
+        <div class="filter-group" id="searchCategoryFilterGroup" hidden>
+          <label for="searchCategoryFilter">Kategori</label>
+          <select id="searchCategoryFilter">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <div class="attribute-checkbox-list">
+            <label class="attribute-checkbox">
+              <input type="checkbox" id="onSaleFilter" /> <span>Kampanyalı ürünler</span>
+            </label>
+            <label class="attribute-checkbox">
+              <input type="checkbox" id="newFilter" /> <span>Yeni ürünler</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="brandFilter">Marka</label>
+          <select id="brandFilter">
+            <option value="">Tüm markalar</option>
+          </select>
+        </div>
+
+        <div id="attributeFilters"></div>
+
+        <div class="filter-group">
+          <label for="sortFilter">Sıralama</label>
+          <select id="sortFilter">
+            <option value="name">İsme göre (A–Z)</option>
+            <option value="name_desc">İsme göre (Z–A)</option>
+            <option value="price_asc">Fiyat (Düşük → Yüksek)</option>
+            <option value="price_desc">Fiyat (Yüksek → Düşük)</option>
+            <option value="newest">Yeni Eklenenler</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Fiyat aralığı (TL)</label>
+          <div class="price-range">
+            <input id="minPrice" type="number" placeholder="Min" min="0" step="0.01" />
+            <span class="range-sep">—</span>
+            <input id="maxPrice" type="number" placeholder="Max" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <button id="applyFilters" class="apply-btn" type="button">Filtreleri Uygula</button>
+      </aside>
+
+      <section class="products-section">
+        <div class="results-bar">
+          <p id="resultsCount" class="results-count"></p>
+          <div id="activeFilters" class="active-filters"></div>
+        </div>
+        <div id="products" class="product-grid"></div>
+        <div id="pagination" class="pagination"></div>
+      </section>
+    </main>
+
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <button id="closeModal" class="modal-close" aria-label="Kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div class="modal-body">
+          <div class="modal-col-offers">
+            <p class="modal-subtitle">Mağaza fiyatları</p>
+            <div id="offers" class="offers-list"></div>
+          </div>
+          <div class="modal-col-similar">
+            <p class="modal-subtitle">Benzer ürünler</p>
+            <div id="similarProducts" class="similar-product-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
   </body>
 </html>
