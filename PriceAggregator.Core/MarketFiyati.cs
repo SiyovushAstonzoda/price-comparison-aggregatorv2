@@ -88,8 +88,11 @@ public class MarketFiyatiScraper
                 ImageUrl = p.TryGetProperty("imageUrl", out var image) ? image.GetString() : null,
                 Price = price,
                 RegularPrice = price,
-                SourceCategory = p.TryGetProperty("main_category", out var mainCat) ? mainCat.GetString() : null,
-                ProductUrl = $"https://marketfiyati.org.tr/detay/{idString}/{GenerateSlug(p.GetProperty("title").GetString() ?? "")}"
+                ProductUrl = $"https://marketfiyati.org.tr/detay/{idString}/{GenerateSlug(p.GetProperty("title").GetString() ?? "")}",
+                // MarketFiyati only gives plain-text category names (no ids/slugs) —
+                // main_category is the leaf, menu_category the root; no middle tier.
+                CategoryName = p.TryGetProperty("main_category", out var mainCat) ? mainCat.GetString() : null,
+                RootCategoryName = p.TryGetProperty("menu_category", out var menuCat) ? menuCat.GetString() : null
             });
         }
 

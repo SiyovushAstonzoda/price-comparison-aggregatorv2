@@ -2,6 +2,7 @@ using System.Text.Json;
 
 namespace PriceAggregator.Core;
 
+
 public class IkeaScraper
 {
     private readonly HttpClient _httpClient;
@@ -44,88 +45,170 @@ public class IkeaScraper
 
     }
 
+    private const int PageSize = 24;
+    private const int MaxPages = 3;
+
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
-        var url =
-            "https://frontendapi.ikea.com.tr/api/search/products" +
-            $"?Keyword={Uri.EscapeDataString(searchTerm)}" +
-            "&language=tr" +
-            "&IncludeFilters=false" +
-            "&StoreCode=331" +
-            "&sortby=None" +
-            "&page=1" +
-            "&size=24" +
-            "&SearchIn=product" +
-            "&IncludeColorVariants=true";
-
-        var response = await _httpClient.GetStringAsync(url);
-
-        using var json = JsonDocument.Parse(response);
-
         var results = new List<ProductDto>();
 
-        if (!json.RootElement.TryGetProperty("products", out var products) ||
-            products.ValueKind != JsonValueKind.Array)
+        for (int page = 1; page <= MaxPages; page++)
         {
-            return results;
-        }
+            var url =
+                "https://frontendapi.ikea.com.tr/api/search/products" +
+                $"?Keyword={Uri.EscapeDataString(searchTerm)}" +
+                "&language=tr" +
+                "&IncludeFilters=false" +
+                "&StoreCode=331" +
+                "&sortby=None" +
+                $"&page={page}" +
+                $"&size={PageSize}" +
+                "&SearchIn=product" +
+                "&IncludeColorVariants=true";
 
-        foreach (var p in products.EnumerateArray())
-        {
-            string? imageUrl = null;
+            var response = await _httpClient.GetStringAsync(url);
 
-            if (
-                p.TryGetProperty("images", out var images) &&
-                images.ValueKind == JsonValueKind.Array &&
-                images.GetArrayLength() > 0 &&
-                images[0].TryGetProperty("image", out var imgProp)
-            )
+            using var json = JsonDocument.Parse(response);
+
+            if (!json.RootElement.TryGetProperty("products", out var products) ||
+                products.ValueKind != JsonValueKind.Array)
             {
-                imageUrl = imgProp.GetString();
+                break;
             }
 
-            var title = p.TryGetProperty("title", out var tProp) ? tProp.GetString() ?? "" : "";
-            var subTitle = p.TryGetProperty("subTitle", out var stProp) ? stProp.GetString() ?? "" : "";
-
-            var productName = $"{title} {subTitle}".Trim();
-
-            var productPath = p.TryGetProperty("url", out var uProp) ? uProp.GetString() ?? "" : "";
-            var productUrl = string.IsNullOrWhiteSpace(productPath)
-                ? "https://www.ikea.com.tr"
-                : (productPath.StartsWith("http", StringComparison.OrdinalIgnoreCase)
-                    ? productPath
-                    : $"https://www.ikea.com.tr{productPath}");
-
-            long id = 0;
-            if (p.TryGetProperty("id", out var idProp))
+            foreach (var p in products.EnumerateArray())
             {
-                if (idProp.ValueKind == JsonValueKind.Number)
-                    id = idProp.GetInt64();
-                else if (idProp.ValueKind == JsonValueKind.String && long.TryParse(idProp.GetString(), out var parsedId))
-                    id = parsedId;
+                string? imageUrl = null;
+
+                if (
+                    p.TryGetProperty("images", out var images) &&
+                    images.ValueKind == JsonValueKind.Array &&
+                    images.GetArrayLength() > 0 &&
+                    images[0].TryGetProperty("image", out var imgProp)
+                )
+                {
+                    imageUrl = imgProp.GetString();
+                }
+
+                var title = p.TryGetProperty("title", out var tProp) ? tProp.GetString() ?? "" : "";
+                var subTitle = p.TryGetProperty("subTitle", out var stProp) ? stProp.GetString() ?? "" : "";
+
+                var productName = $"{title} {subTitle}".Trim();
+
+                var productPath = p.TryGetProperty("url", out var uProp) ? uProp.GetString() ?? "" : "";
+                var productUrl = string.IsNullOrWhiteSpace(productPath)
+                    ? "https://www.ikea.com.tr"
+                    : (productPath.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+                        ? productPath
+                        : $"https://www.ikea.com.tr{productPath}");
+
+                long id = 0;
+                if (p.TryGetProperty("id", out var idProp))
+                {
+                    if (idProp.ValueKind == JsonValueKind.Number)
+                        id = idProp.GetInt64();
+                    else if (idProp.ValueKind == JsonValueKind.String && long.TryParse(idProp.GetString(), out var parsedId))
+                        id = parsedId;
+                }
+
+                decimal price = 0;
+                if (p.TryGetProperty("price", out var priceProp) && priceProp.ValueKind == JsonValueKind.Number)
+                {
+                    price = priceProp.GetDecimal();
+                }
+
+                decimal regularPrice = price;
+                if (p.TryGetProperty("crossPrice", out var crossPriceProp) && crossPriceProp.ValueKind == JsonValueKind.Number)
+                {
+                    regularPrice = crossPriceProp.GetDecimal();
+                }
+                else if (p.TryGetProperty("regularPrice", out var regPriceProp) && regPriceProp.ValueKind == JsonValueKind.Number)
+                {
+                    regularPrice = regPriceProp.GetDecimal();
+                }
+
+                // Each product can appear under several parallel "navigations" (e.g. both a
+                // room-based tree and a product-type tree) — each with its own "breadcrumb"
+                // array (root-first). Prefer whichever breadcrumb starts at "Mobilyalar", the
+                // general furniture root, so products land in one consistent tree instead of
+                // whichever tree happened to be listed first.
+                string? categoryName = null, parentCategoryName = null, rootCategoryName = null;
+                if (p.TryGetProperty("navigations", out var navs) && navs.ValueKind == JsonValueKind.Array)
+                {
+                    JsonElement? chosenBreadcrumb = null;
+                    foreach (var nav in navs.EnumerateArray())
+                    {
+                        if (!nav.TryGetProperty("breadcrumb", out var bc) || bc.ValueKind != JsonValueKind.Array || bc.GetArrayLength() == 0)
+                            continue;
+
+                        var firstName = bc[0].TryGetProperty("name", out var fn) ? fn.GetString() : null;
+                        if (firstName == "Mobilyalar") { chosenBreadcrumb = bc; break; }
+                        chosenBreadcrumb ??= bc;
+                    }
+
+                    if (chosenBreadcrumb is JsonElement bcEl)
+                    {
+                        var names = bcEl.EnumerateArray()
+                            .Select(b => b.TryGetProperty("name", out var n) ? n.GetString() : null)
+                            .Where(n => !string.IsNullOrWhiteSpace(n))
+                            .ToList();
+
+                        if (names.Count >= 3)
+                        {
+                            rootCategoryName = names[0];
+                            parentCategoryName = names[1];
+                            categoryName = names[^1];
+                        }
+                        else if (names.Count == 2)
+                        {
+                            parentCategoryName = names[0];
+                            categoryName = names[1];
+                        }
+                        else if (names.Count == 1)
+                        {
+                            categoryName = names[0];
+                        }
+                    }
+                }
+
+                // "unitColorName" is IKEA's own structured color/material label for this
+                // specific variant (e.g. "paslanmaz çelik-bej" — MatchingService.SplitCompoundValue
+                // breaks the hyphenated combo into separate filter values). "familyName" is
+                // IKEA's product series/model name (e.g. "MOFALLA", "HEMNES") — a genuine,
+                // clean per-product attribute distinct from the title itself.
+                var colorName = p.TryGetProperty("unitColorName", out var colorProp) ? colorProp.GetString() : null;
+                var seriesName = p.TryGetProperty("familyName", out var familyProp) ? familyProp.GetString() : null;
+
+                Dictionary<string, string>? productAttributes = null;
+                if (!string.IsNullOrWhiteSpace(colorName) || !string.IsNullOrWhiteSpace(seriesName))
+                {
+                    productAttributes = new Dictionary<string, string>();
+                    if (!string.IsNullOrWhiteSpace(colorName)) productAttributes["Renk"] = colorName;
+                    if (!string.IsNullOrWhiteSpace(seriesName)) productAttributes["Seri"] = seriesName;
+                }
+
+                results.Add(new ProductDto
+                {
+                    ExternalId = id,
+                    Title = productName,
+                    ImageUrl = imageUrl,
+                    Price = price,
+                    RegularPrice = regularPrice,
+                    ProductUrl = productUrl,
+                    // IKEA's search API has no brand field — every product it sells is IKEA's
+                    // own private label, so the store name itself is the real brand.
+                    Brand = "IKEA",
+                    CategoryName = categoryName,
+                    ParentCategoryName = parentCategoryName,
+                    RootCategoryName = rootCategoryName,
+                    Attributes = productAttributes
+                });
             }
 
-            decimal price = 0;
-            if (p.TryGetProperty("price", out var priceProp) && priceProp.ValueKind == JsonValueKind.Number)
-            {
-                price = priceProp.GetDecimal();
-            }
-
-            decimal regularPrice = price;
-            if (p.TryGetProperty("regularPrice", out var regPriceProp) && regPriceProp.ValueKind == JsonValueKind.Number)
-            {
-                regularPrice = regPriceProp.GetDecimal();
-            }
-
-            results.Add(new ProductDto
-            {
-                ExternalId = id,
-                Title = productName,
-                ImageUrl = imageUrl,
-                Price = price,
-                RegularPrice = regularPrice,
-                ProductUrl = productUrl
-            });
+            var total = json.RootElement.TryGetProperty("total", out var totalEl) && totalEl.ValueKind == JsonValueKind.Number
+                ? totalEl.GetInt32()
+                : 0;
+            if (products.GetArrayLength() == 0 || results.Count >= total) break;
         }
 
         return results;

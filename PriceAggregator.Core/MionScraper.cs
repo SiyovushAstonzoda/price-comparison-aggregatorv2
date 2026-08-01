@@ -20,52 +20,79 @@ public class MionScraper
         _httpClient.DefaultRequestHeaders.Add("Referer", "https://www.mion.com.tr/");
     }
 
+    private const int MaxPages = 3;
+
     public async Task<List<ProductDto>> FetchProductsAsync(string searchTerm)
     {
         var encodedSearch = Uri.EscapeDataString(searchTerm);
-
-        var url =
-            $"https://www.migros.com.tr/rest/mion/search/screens/products?q={encodedSearch}";
-
-        var response = await _httpClient.GetStringAsync(url);
-
-        using var json = JsonDocument.Parse(response);
-
         var results = new List<ProductDto>();
 
-        var products = json.RootElement
-            .GetProperty("data")
-            .GetProperty("searchInfo")
-            .GetProperty("storeProductInfos");
-
-        foreach (var p in products.EnumerateArray())
+        for (int page = 1; page <= MaxPages; page++)
         {
-            string? imageUrl = null;
+            var url =
+                $"https://www.migros.com.tr/rest/mion/search/screens/products?q={encodedSearch}&page={page}";
 
-            if (p.TryGetProperty("images", out var images) &&
-                images.GetArrayLength() > 0)
+            var response = await _httpClient.GetStringAsync(url);
+
+            using var json = JsonDocument.Parse(response);
+
+            var searchInfo = json.RootElement
+                .GetProperty("data")
+                .GetProperty("searchInfo");
+            var products = searchInfo.GetProperty("storeProductInfos");
+
+            if (products.GetArrayLength() == 0) break;
+
+            foreach (var p in products.EnumerateArray())
             {
-                imageUrl = images[0]
-                    .GetProperty("urls")
-                    .GetProperty("PRODUCT_DETAIL")
-                    .GetString();
+                string? imageUrl = null;
+
+                if (p.TryGetProperty("images", out var images) &&
+                    images.GetArrayLength() > 0)
+                {
+                    imageUrl = images[0]
+                        .GetProperty("urls")
+                        .GetProperty("PRODUCT_DETAIL")
+                        .GetString();
+                }
+
+                string brand = p.TryGetProperty("brand", out var brandEl) && brandEl.ValueKind == JsonValueKind.Object
+                    ? brandEl.GetProperty("name").GetString() ?? ""
+                    : "";
+
+                // Mion runs on the same Migros commerce platform, so its product JSON has the
+                // identical category/categoryAscendants shape (see MacroCenterScraper, which
+                // reuses this same parser for the same reason).
+                var (categoryName, parentName, rootName) = MigrosScraper.ParseCategory(p);
+                var (unitType, unitAmount, sourceUnitPrice) = MigrosScraper.ParseUnitInfo(p);
+
+                results.Add(new ProductDto
+                {
+                    ExternalId = p.GetProperty("id").GetInt64(),
+
+                    Title = p.GetProperty("name").GetString() ?? "",
+
+                    ImageUrl = imageUrl,
+
+                    Price = p.GetProperty("shownPrice").GetInt32() / 100m,
+
+                    RegularPrice = p.GetProperty("regularPrice").GetInt32() / 100m,
+
+                    ProductUrl =
+                        $"https://www.mion.com.tr/urun/{p.GetProperty("prettyName").GetString()}",
+
+                    Brand = brand,
+                    CategoryName = categoryName,
+                    ParentCategoryName = parentName,
+                    RootCategoryName = rootName,
+                    SourceUnitType = unitType,
+                    SourceUnitAmount = unitAmount,
+                    SourceUnitPrice = sourceUnitPrice
+                });
             }
 
-            results.Add(new ProductDto
-            {
-                ExternalId = p.GetProperty("id").GetInt64(),
-
-                Title = p.GetProperty("name").GetString() ?? "",
-
-                ImageUrl = imageUrl,
-
-                Price = p.GetProperty("shownPrice").GetInt32() / 100m,
-
-                RegularPrice = p.GetProperty("regularPrice").GetInt32() / 100m,
-
-                ProductUrl =
-                    $"https://www.mion.com.tr/urun/{p.GetProperty("prettyName").GetString()}"
-            });
+            var pageCount = searchInfo.TryGetProperty("pageCount", out var pageCountEl) ? pageCountEl.GetInt32() : 1;
+            if (page >= pageCount) break;
         }
 
         return results;
