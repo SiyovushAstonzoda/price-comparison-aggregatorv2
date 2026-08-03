@@ -12,6 +12,13 @@ public class Worker : BackgroundService
 
     private readonly TimeSpan _interval = TimeSpan.FromHours(6); // adjust as needed
 
+    private readonly IEnumerable<IProductScraper> _scrapers;
+
+    public Worker(IEnumerable<IProductScraper> scrapers)
+    {
+        _scrapers = scrapers;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -46,30 +53,8 @@ public class Worker : BackgroundService
 
     private async Task RunScrapeAsync()
     {
-        var httpClient1 = new HttpClient();
-        var migrosScraper = new MigrosScraper(httpClient1);
-
-        var httpClient2 = new HttpClient();
-        var macroCenterScraper = new MacroCenterScraper(httpClient2);
-
-        var httpClient3 = new HttpClient();
-        var marketFiyatiScraper = new MarketFiyatiScraper(httpClient3);
-
-        var httpClient6 = new HttpClient();
-        var hakmarExpressScraper = new HakmarExpressScraper(httpClient6);
-
-        var httpClient8 = new HttpClient();
-        var cagriMarketScraper = new CagriMarketScraper(httpClient8);
-
-        var httpClient4 = new HttpClient();
-        var evideaScraper = new EvideaScraper(httpClient4);
-
-        var httpClient5 = new HttpClient();
-        var mionScraper = new MionScraper(httpClient5);
-
-        var httpClient7 = new HttpClient();
-        var ikeaScraper = new IkeaScraper(httpClient7);
-
+        var marketScrapers = _scrapers.Where(s => s.Sector == ScraperSector.Market).ToList();
+        var mobilyaScrapers = _scrapers.Where(s => s.Sector == ScraperSector.Mobilya).ToList();
 
         var repo = new ProductRepository(_connectionString);
         var matchingService = new MatchingService(_connectionString);
@@ -81,20 +66,11 @@ public class Worker : BackgroundService
         {
             Logger.Log($"--- Searching '{searchItem}' (market) ---");
 
-            var migrosRes = await RunScraperSafe("migros", () => migrosScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += migrosRes.saved; failedCount += migrosRes.failed;
-
-            var macroRes = await RunScraperSafe("macrocenter", () => macroCenterScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += macroRes.saved; failedCount += macroRes.failed;
-
-            var marketFiyatiRes = await RunScraperSafe("marketfiyati", () => marketFiyatiScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += marketFiyatiRes.saved; failedCount += marketFiyatiRes.failed;
-
-            var hakmarRes = await RunScraperSafe("hakmarexpress", () => hakmarExpressScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += hakmarRes.saved; failedCount += hakmarRes.failed;
-
-            var cagriRes = await RunScraperSafe("cagrimarket", () => cagriMarketScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += cagriRes.saved; failedCount += cagriRes.failed;
+            foreach (var scraper in marketScrapers)
+            {
+                var res = await RunScraperSafe(scraper.Name, () => scraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+                savedCount += res.saved; failedCount += res.failed;
+            }
 
             // Small delay between search terms to avoid hammering the sites back-to-back
             //await Task.Delay(TimeSpan.FromSeconds(3));
@@ -104,14 +80,11 @@ public class Worker : BackgroundService
         {
             Logger.Log($"--- Searching '{searchItem}' (mobilya) ---");
 
-            var evideaRes = await RunScraperSafe("evidea", () => evideaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += evideaRes.saved; failedCount += evideaRes.failed;
-
-            var mionRes = await RunScraperSafe("mion", () => mionScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += mionRes.saved; failedCount += mionRes.failed;
-
-            var ikeaRes = await RunScraperSafe("ikea", () => ikeaScraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
-            savedCount += ikeaRes.saved; failedCount += ikeaRes.failed;
+            foreach (var scraper in mobilyaScrapers)
+            {
+                var res = await RunScraperSafe(scraper.Name, () => scraper.FetchProductsAsync(searchItem), repo, matchingService, searchItem);
+                savedCount += res.saved; failedCount += res.failed;
+            }
         }
 
         Logger.Log($"Saved+matched successfully: {savedCount}, Failed: {failedCount}");
